@@ -1,0 +1,35 @@
+{
+  "name": "init_server",
+  "version": "1.0.0",
+  "description": "init server file",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Team-InIT/inIT_SERVER.git"
+  },
+  "author": "yoon1013",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Team-InIT/inIT_SERVER/issues"
+  },
+  "homepage": "https://github.com/Team-InIT/inIT_SERVER#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.1",
+    "express-session": "^1.17.2",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
+    "nunjucks": "^3.2.3",
+    "sequelize": "^6.19.0",
+    "sequelize-cli": "^6.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  }
+}
