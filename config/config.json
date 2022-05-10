@@ -1,7 +1,7 @@
 {
   "development": {
-    "username": "root",
-    "password": "wkddbswjd1013!",
+    "username": "testuser",
+    "password": "dbswjd991013!",
     "database": "initdatabase",
     "host": "127.0.0.1",
     "dialect": "mysql"
