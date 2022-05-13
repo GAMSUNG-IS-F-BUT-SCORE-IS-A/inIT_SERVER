@@ -6,7 +6,7 @@ module.exports = class Member extends Sequelize.Model {
             mNum: {
                 type: Sequelize.INTEGER,
                 primaryKey: true,
-                allowNull: false,
+                //allowNull: false,
                 unique: true,
                 autoIncrement: true,
             },
@@ -33,12 +33,17 @@ module.exports = class Member extends Sequelize.Model {
             mDept: {
                 type: Sequelize.STRING(100),
             },
+            mAcademic: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                defaultValue: 0,
+            },
             mGender: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
             mPosition: {
-                type: Sequelize.CHAR,
+                type: Sequelize.INTEGER,
                 allowNull: false,
             },
             mLevel: {

@@ -10,6 +10,7 @@ const dotenv = require('dotenv');
 //시퀄라이저
 const { sequelize } = require('./models');
 const Member = require('./models/members');
+//const { Model } = require('sequelize/types');
 
 //dotenv 패키지 사용
 dotenv.config();
@@ -49,35 +50,10 @@ app.use(session({
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '172.18.13.102', (err)=> {
+app.listen(3006, '172.30.1.25', (err)=> {
     if(!err) {
         console.log('server start');
     }
-})
-
-
-//테스트 get
-app.get('/test', function(req, res) {
-    Member.create({
-        mNum: 2,
-        mType: 0,
-        mID: "test1",
-        mPW: "test1234",
-        mName: "김더미",
-        mEmail: "test@gmail.com",
-        mDept: "소속1",
-        mGender: 0,
-        mPosition: "02",
-        mLevel: 2,
-        mApproval: 0,
-    })
-    .then((result)=>{
-        console.log(result);
-        res.json(result);
-    })
-    .catch((err)=>{
-        console.log(err);
-    })
 })
 
 //앱 로그인
@@ -94,19 +70,25 @@ app.post('/login', function(req, res) {
     })
     .then((members) => {
         if(members.length == 0) {
+            members = null;
             message = "존재하지 않는 아이디입니다.";
         }
-        else if(members[0].mPW == mPW) {
+        else if(members[0].mPW != mPW) {
+            members = null;
             message = "비밀번호가 틀렸습니다.";
         }
-        else if(members[0].mApproval == 0) {
-            message = "승인 대기 중입니다.";
-        }
-        else if(members[0].mApproval == 2) {
-            message = "탈퇴한 계정입니다.";
-        }
-        else if(members[0].mApproval == 1) {
-            message = members[0].mName + "님 환영합니다.";
+        else if(members[0].mPW == mPW) {
+            if(members[0].mApproval == 0) {
+                members = null;
+                message = "승인 대기 중입니다.";
+            }
+            else if(members[0].mApproval == 2) {
+                members = null;
+                message = "탈퇴한 계정입니다.";
+            }
+            else if(members[0].mApproval == 1) {
+                message = members[0].mName + "님 환영합니다.";
+            }
         }
         res.json({
             'member': members,
@@ -117,3 +99,40 @@ app.post('/login', function(req, res) {
         console.log(err);
     });
 });
+
+//회원가입
+app.post('/signUp', function(req, res) {
+    console.log(res);
+    var mID = req.body.mID;
+    var mPW = req.body.mPW;
+    var mName = req.body.mName;
+    var mEmail = req.body.mEmail;
+    var mDept = req.body.mDept;
+    var mAcademic = req.body.mAcademic;
+    var mGender = req.body.mGender;
+    var mPosition = req.body.mPosition;
+    var mLevel = req.body.mLevel;
+
+    Member.create({
+        mType: 0,//회원유형 일단 0(일반회원) -> 회원유형 나눠지면 수정 필요!
+        mID: mID,
+        mPW: mPW,
+        mName: mName,
+        mEmail: mEmail,
+        mDept: mDept,
+        mAcademic: mAcademic,
+        mGender: mGender,
+        mPosition: mPosition,
+        mLevel: mLevel,
+        mApproval: 0,
+    })
+    .then(() => {
+        message = "회원가입이 완료되었습니다.";
+        res.json({
+            message: message,
+        })
+    })
+    .catch((err)=>{
+        console.log(err);
+    });
+})
