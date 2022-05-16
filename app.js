@@ -136,28 +136,71 @@ app.post('/signUp', function(req, res) {
     .catch((err)=>{
         console.log(err);
     });
-})
+});
 
-//테스트
-app.post('/test', function(req, res) {
-    ProjectInfo.create({
-        pTitle: "test",
-        pType: 0,
-        pRdateStart: "2022-05-20",
-        pRdateDue: "2022-05-26",
-        pPdateStart: "2022-06-01",
-        pPdateDue: "2022-06-25",
-        pServer: 3,
-        mNum: 4,
-        pStatus: 1,
+//아이디 중복 확인
+app.post('/idCheck', function(req, res) {
+    var id = req.body.mID;
+    var is_check = false;
+    var message = "";
+
+    Member.findAll({
+        where: {
+            mID: id,
+        },
     })
-    .then(()=> {
-        console.log("완료");
+    .then((result)=>{
+        if(result.length == 0) {//결과 없음
+            message = "사용 가능한 아이디입니다.";
+            is_check = true;
+            res.json({
+                is_check: is_check,
+                message: message
+            })
+        }
+        else {
+            message = "이미 사용 중인 아이디입니다."
+            res.json({
+                is_check: is_check,
+                message: message,
+            })
+        }
     })
-    .catch((err)=>{
+    .catch((err)=> {
         console.log(err);
     });
+});
+
+//회원 탈퇴
+app.post('/withdraw', function(req, res) {
+    var mID = req.body.mID;
+    var is_checked = req.body.is_checked;
+    var message = "";
+
+    if(is_checked == false) {
+        message = "탈퇴 확인을 완료해주세요";
+        res.json({
+            message: message
+        });
+    }
+    else {
+        Member.destroy({
+            where: {
+                mID: mID
+            }
+        })
+        .then((result)=>{
+            message = "탈퇴가 완료되었습니다.";
+            res.json({
+                message: message
+            })
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+    }
 })
+
 
 //프로젝트 정보 업로드
 app.post('/addProject', function(req, res) {
@@ -204,3 +247,19 @@ app.post('/addProject', function(req, res) {
         console.log(err);
     })
 })
+
+//프로젝트 공고 삭제
+app.post('/delProject', function(req, res) {
+    var pNum = req.body.pNum;
+
+    ProjectInfo.destroy({where: {pNum: pNum}})
+    .then(()=>{
+        var message = "프로젝트 모집 공고가 삭제되었습니다.";
+        res.json({
+            message: message
+        })
+    })
+    .catch((err)=>{
+        console.log(err);
+    });
+});
