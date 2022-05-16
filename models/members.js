@@ -70,5 +70,7 @@ module.exports = class Member extends Sequelize.Model {
             collate: 'utf8_general_ci',
         });
     }
-    static associate(db) {}
+    static associate(db) {
+        db.Member.hasMany(db.ProjectInfo, {foreignKey: 'mNum', sourceKey: 'mNum'});
+    }
 };

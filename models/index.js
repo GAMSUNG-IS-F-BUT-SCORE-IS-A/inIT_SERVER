@@ -2,6 +2,7 @@
 
 const Sequelize = require('sequelize');
 const Member = require('./members');
+const ProjectInfo = require('./projectinfo');
 const member = require('./members');
 
 const env = process.env.NODE_ENV || 'development';
@@ -14,8 +15,12 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 db.sequelize = sequelize;
 
 db.Member = Member;
+db.ProjectInfo = ProjectInfo;
 
 Member.init(sequelize);
+ProjectInfo.init(sequelize);
+
 Member.associate(db);
+ProjectInfo.associate(db);
 
 module.exports = db;

@@ -10,6 +10,7 @@ const dotenv = require('dotenv');
 //시퀄라이저
 const { sequelize } = require('./models');
 const Member = require('./models/members');
+const ProjectInfo = require('./models/projectinfo');
 //const { Model } = require('sequelize/types');
 
 //dotenv 패키지 사용
@@ -50,7 +51,7 @@ app.use(session({
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '172.30.1.25', (err)=> {
+app.listen(3006, '172.18.9.110', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -131,6 +132,27 @@ app.post('/signUp', function(req, res) {
         res.json({
             message: message,
         })
+    })
+    .catch((err)=>{
+        console.log(err);
+    });
+})
+
+//테스트
+app.post('/test', function(req, res) {
+    ProjectInfo.create({
+        pTitle: "test",
+        pType: 0,
+        pRdateStart: "2022-05-20",
+        pRdateDue: "2022-05-26",
+        pPdateStart: "2022-06-01",
+        pPdateDue: "2022-06-25",
+        pServer: 3,
+        mNum: 4,
+        pStatus: 1,
+    })
+    .then(()=> {
+        console.log("완료");
     })
     .catch((err)=>{
         console.log(err);
