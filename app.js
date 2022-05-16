@@ -51,7 +51,7 @@ app.use(session({
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '172.18.9.110', (err)=> {
+app.listen(3006, '172.30.1.25', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -73,28 +73,49 @@ app.post('/login', function(req, res) {
         if(members.length == 0) {
             members = null;
             message = "존재하지 않는 아이디입니다.";
+            res.json({
+                'code': 201,
+                'member': members,
+                'message': message,
+            })
         }
         else if(members[0].mPW != mPW) {
             members = null;
             message = "비밀번호가 틀렸습니다.";
+            res.json({
+                'code': 202,
+                'member': members,
+                'message': message,
+            })
         }
         else if(members[0].mPW == mPW) {
             if(members[0].mApproval == 0) {
                 members = null;
                 message = "승인 대기 중입니다.";
+                res.json({
+                    'code': 203,
+                    'member': members,
+                    'message': message,
+                })
             }
             else if(members[0].mApproval == 2) {
                 members = null;
                 message = "탈퇴한 계정입니다.";
+                res.json({
+                    'code': 204,
+                    'member': members,
+                    'message': message,
+                })
             }
             else if(members[0].mApproval == 1) {
                 message = members[0].mName + "님 환영합니다.";
+                res.json({
+                    'code': 205,
+                    'member': members,
+                    'message': message,
+                })
             }
         }
-        res.json({
-            'member': members,
-            'message': message,
-        })
     })
     .catch((err)=>{
         console.log(err);
@@ -128,9 +149,11 @@ app.post('/signUp', function(req, res) {
         mApproval: 0,
     })
     .then(() => {
+        var code = 201;
         message = "회원가입이 완료되었습니다.";
         res.json({
-            message: message,
+            "code": code,
+            "message": message,
         })
     })
     .catch((err)=>{
@@ -154,15 +177,17 @@ app.post('/idCheck', function(req, res) {
             message = "사용 가능한 아이디입니다.";
             is_check = true;
             res.json({
-                is_check: is_check,
-                message: message
+                "code": 201,
+                "is_check": is_check,
+                "message": message
             })
         }
         else {
             message = "이미 사용 중인 아이디입니다."
             res.json({
-                is_check: is_check,
-                message: message,
+                "code": 202,
+                "is_check": is_check,
+                "message": message,
             })
         }
     })
@@ -173,26 +198,28 @@ app.post('/idCheck', function(req, res) {
 
 //회원 탈퇴
 app.post('/withdraw', function(req, res) {
-    var mID = req.body.mID;
+    var mNum = req.body.mNum;
     var is_checked = req.body.is_checked;
     var message = "";
 
     if(is_checked == false) {
         message = "탈퇴 확인을 완료해주세요";
         res.json({
-            message: message
+            "code": 201,
+            "message": message
         });
     }
     else {
         Member.destroy({
             where: {
-                mID: mID
+                mNum: mNum
             }
         })
         .then((result)=>{
             message = "탈퇴가 완료되었습니다.";
             res.json({
-                message: message
+                "code": 202,
+                "message": message
             })
         })
         .catch((err)=>{
@@ -240,7 +267,8 @@ app.post('/addProject', function(req, res) {
     .then(()=>{
         var message = "프로젝트 모집 공고가 등록되었습니다."
         res.json({
-            message: message,
+            "code": 201,
+            "message": message,
         })
     })
     .catch((err)=>{
@@ -256,7 +284,8 @@ app.post('/delProject', function(req, res) {
     .then(()=>{
         var message = "프로젝트 모집 공고가 삭제되었습니다.";
         res.json({
-            message: message
+            "code": 201,
+            "message": message
         })
     })
     .catch((err)=>{
