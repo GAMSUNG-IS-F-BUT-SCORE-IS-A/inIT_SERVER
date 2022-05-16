@@ -158,3 +158,49 @@ app.post('/test', function(req, res) {
         console.log(err);
     });
 })
+
+//프로젝트 정보 업로드
+app.post('/addProject', function(req, res) {
+    console.log(req);
+    var pTitle = req.body.pTitle;
+    var pType = req.body.pType;
+    var pRdateStart = req.body.pRdateStart;
+    var pRdateDue = req.body.pRdateDue;
+    var pPdateStart = req.body.pPdateStart;
+    var pPdateDue = req.body.pPdateDue;
+    var pPlan = req.body.pPlan;
+    var pDesign = req.body.pDesign;
+    var pAndroid = req.body.pAndroid;
+    var pIos = req.body.pIos;
+    var pGame = req.body.pGame;
+    var pWeb = req.body.pWeb;
+    var pServer = req.body.pServer;
+    var mNum = req.body.mNum;
+    
+    ProjectInfo.create({
+        pTitle: pTitle,
+        pType: pType,
+        pRdateStart: pRdateStart,
+        pRdateDue: pRdateDue,
+        pPdateStart: pPdateStart,
+        pPdateDue: pPdateDue,
+        pPlan: pPlan,
+        pDesign: pDesign,
+        pAndroid: pAndroid,
+        pIos: pIos,
+        pGame: pGame,
+        pWeb: pWeb,
+        pServer: pServer,
+        mNum: mNum,
+        pStatus: 0
+    })
+    .then(()=>{
+        var message = "프로젝트 모집 공고가 등록되었습니다."
+        res.json({
+            message: message,
+        })
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+})
