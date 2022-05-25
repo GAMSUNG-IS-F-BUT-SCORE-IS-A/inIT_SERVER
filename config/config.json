@@ -2,7 +2,7 @@
   "development": {
     "username": "testuser",
     "password": "dbswjd991013!",
-    "database": "initdatabase",
+    "database": "init",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },

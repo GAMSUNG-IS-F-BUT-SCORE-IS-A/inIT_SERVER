@@ -196,6 +196,35 @@ app.post('/idCheck', function(req, res) {
     });
 });
 
+//회원 정보 수정
+app.post('/modifyMember', function(req, res) {
+    var mNum = req.body.mNum;
+    var mName = req.body.mName;
+    var mEmail = req.body.mEmail;
+    var mGender = req.body.mGender;
+    var mIntroduction = req.body.mIntroduction;
+
+    Member.update({
+        mName: mName,
+        mEmail: mEmail,
+        mGender: mGender,
+        mIntroduction: mIntroduction,
+        mApproval: 0,
+    }, {
+        where: {mNum: mNum}
+    })
+    .then(()=>{
+        var message = "회원 정보 수정이 완료되었습니다.";
+        res.json({
+            "code": 201,
+            "message": message,
+        })
+    })
+    .catch((err)=>{
+        console.log(err);
+    });
+});
+
 //회원 탈퇴
 app.post('/withdraw', function(req, res) {
     var mNum = req.body.mNum;
