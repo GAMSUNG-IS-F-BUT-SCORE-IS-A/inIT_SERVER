@@ -10,10 +10,6 @@ module.exports = class Member extends Sequelize.Model {
                 unique: true,
                 autoIncrement: true,
             },
-            mType: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
-            },
             mID: {
                 type: Sequelize.STRING(16),
                 allowNull: false,
@@ -36,7 +32,6 @@ module.exports = class Member extends Sequelize.Model {
             mAcademic: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                defaultValue: 0,
             },
             mGender: {
                 type: Sequelize.INTEGER,
@@ -50,14 +45,26 @@ module.exports = class Member extends Sequelize.Model {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
+            mIntroduction: {
+                type: Sequelize.TEXT
+            },
+            mGit: {
+                type: Sequelize.STRING(200)
+            },
+            mNotion: {
+                type: Sequelize.STRING(200)
+            },
+            mBlog: {
+                type: Sequelize.STRING(200)
+            },
+            mPhoto: {
+                type: Sequelize.BLOB
+            },
             mApproval: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 defaultValue: 0
             },
-            mIntroduction: {
-                type: Sequelize.TEXT
-            }
         },
         {
             sequelize,
@@ -72,5 +79,12 @@ module.exports = class Member extends Sequelize.Model {
     }
     static associate(db) {
         db.Member.hasMany(db.ProjectInfo, {foreignKey: 'mNum', sourceKey: 'mNum'});
+        db.Member.hasMany(db.Stack, {foreignKey: 'mNum', sourcekey: 'mNum'});
+        db.Member.hasMany(db.Zzim, {foreignKey: 'mNum', sourceKey: 'mNum'});
+        db.Member.hasMany(db.Recruit, {foreignKey: 'mNum', sourceKey: 'mNum'});
+        db.Member.hasMany(db.Feed, {foreignKey: 'mNum', sourceKey: 'mNum'});
+        db.Member.hasMany(db.TodoManager, {foreignKey: 'mNum', sourceKey: 'mNum'});
+        db.Member.hasMany(db.Evaluation, {foreignKey: 'mNum', sourceKey: 'mNum'});
+        db.Member.hasMany(db.Evaluation, {foreignKey: 'ePerson', sourceKey: 'mNum'});
     }
 };

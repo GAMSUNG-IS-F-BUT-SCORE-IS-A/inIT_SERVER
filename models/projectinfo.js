@@ -16,19 +16,19 @@ module.exports = class ProjectInfo extends Sequelize.Model {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
-            pRdateStart: {
+            pRecruitStart: {
                 type: Sequelize.DATE,
                 allowNull: false,
             },
-            pRdateDue: {
+            pRecruitDue: {
                 type: Sequelize.DATE,
                 allowNull: false,
             },
-            pPdateStart: {
+            pStart: {
                 type: Sequelize.DATE,
                 allowNull: false,
             },
-            pPdateDue: {
+            pDue: {
                 type: Sequelize.DATE,
                 allowNull: false,
             },
@@ -40,11 +40,11 @@ module.exports = class ProjectInfo extends Sequelize.Model {
                 type: Sequelize.INTEGER,
                 defaultValue: 0,
             },
-            pAndroid: {
+            pIos: {
                 type: Sequelize.INTEGER,
                 defaultValue: 0,
             },
-            pIos: {
+            pAos: {
                 type: Sequelize.INTEGER,
                 defaultValue: 0,
             },
@@ -60,11 +60,56 @@ module.exports = class ProjectInfo extends Sequelize.Model {
                 type: Sequelize.INTEGER,
                 defaultValue: 0,
             },
-            mNum: {
+            pDescription: {
+                type: Sequelize.TEXT,
+                allowNull: false
+            },
+            pOnOff: {
+                type: Sequelize.INTEGER,
+                defaultValue: null
+            },
+            pGender: {
+                type: Sequelize.INTEGER,
+                defaultValue: null
+            },
+            pAcademic: {
+                type: Sequelize.INTEGER,
+                defaultValue: null
+            },
+            pPlanf: {
+                type: Sequelize.INTEGER,
+                defaultValue: null
+            },
+            pDesignf: {
+                type: Sequelize.INTEGER,
+                defaultValue: null
+            },
+            pIosf: {
+                type: Sequelize.INTEGER,
+                defaultValue: null
+            },
+            pAosf: {
+                type: Sequelize.INTEGER,
+                defaultValue: null
+            },
+            pGamef: {
+                type: Sequelize.INTEGER,
+                defaultValue: null
+            },
+            pWebf: {
+                type: Sequelize.INTEGER,
+                defaultValue: null
+            },
+            pServerf: {
+                type: Sequelize.INTEGER,
+                defaultValue: null
+            },
+            pState: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
+                defaultValue: 0
             },
-            pStatus: {
+            mNum: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
@@ -81,5 +126,10 @@ module.exports = class ProjectInfo extends Sequelize.Model {
 
     static associate(db) { 
         db.ProjectInfo.belongsTo(db.Member, {foreignKey: 'mNum', targetKey: 'mNum'});
+        db.ProjectInfo.hasMany(db.Zzim, {foreignKey: 'pNum', sourceKey: 'pNum'});
+        db.ProjectInfo.hasMany(db.Recruit, {foreignKey: 'pNum', sourceKey: 'pNum'});
+        db.ProjectInfo.hasMany(db.Feed, {foreignKey: 'pNum', sourceKey: 'pNum'});
+        db.ProjectInfo.hasMany(db.Todo, {foreignKey: 'pNum', sourceKey: 'pNum'});
+        db.ProjectInfo.hasMany(db.Evaluation, {foreignKey: 'pNum', sourceKey: 'pNum'});
     }
 }
