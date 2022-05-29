@@ -5,11 +5,13 @@ module.exports = class Recruit extends Sequelize.Model {
         return super.init({
             mNum: {
                 type: Sequelize.INTEGER,
-                allowNull: false
+                allowNull: false,
+                primaryKey: true
             },
             pNum: {
                 type: Sequelize.INTEGER,
-                allowNull: false
+                allowNull: false,
+                primaryKey: true
             },
             rApproval: {
                 type: Sequelize.INTEGER,
@@ -19,7 +21,7 @@ module.exports = class Recruit extends Sequelize.Model {
             sequelize,
             timestamps: false,
             modelName: 'Recruit',
-            tableName: 'recruit',
+            tableName: 'recruits',
             paranoid: false,
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',

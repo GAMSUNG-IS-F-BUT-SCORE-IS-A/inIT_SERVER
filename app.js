@@ -8,9 +8,13 @@ const session = require('express-session');
 const dotenv = require('dotenv');
 
 //시퀄라이저
+//const { sequelize, Recruit } = require('./models');
 const { sequelize } = require('./models');
+const { Op } = require('sequelize');
 const Member = require('./models/members');
 const ProjectInfo = require('./models/projectinfo');
+const Recruit = require("./models/recruit");
+//const { where } = require('sequelize/types');
 //const { Model } = require('sequelize/types');
 
 //dotenv 패키지 사용
@@ -51,7 +55,7 @@ app.use(session({
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '192.168.1.188', (err)=> {
+app.listen(3006, '192.168.0.3', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -197,18 +201,18 @@ app.post('/idCheck', function(req, res) {
 });
 
 //회원 정보 수정
-app.post('/modifyMember', function(req, res) {
+app.post('/modifyBasicInfo', function(req, res) {
     var mNum = req.body.mNum;
-    var mName = req.body.mName;
     var mEmail = req.body.mEmail;
+    var mDept = req.body.mDept;
+    var mAcademic = req.body.mAcademic;
     var mGender = req.body.mGender;
-    var mIntroduction = req.body.mIntroduction;
 
     Member.update({
-        mName: mName,
         mEmail: mEmail,
+        mDept: mDept,
+        mAcademic: mAcademic,
         mGender: mGender,
-        mIntroduction: mIntroduction,
         mApproval: 0,
     }, {
         where: {mNum: mNum}
@@ -263,35 +267,57 @@ app.post('/addProject', function(req, res) {
     console.log(req);
     var pTitle = req.body.pTitle;
     var pType = req.body.pType;
-    var pRdateStart = req.body.pRdateStart;
-    var pRdateDue = req.body.pRdateDue;
-    var pPdateStart = req.body.pPdateStart;
-    var pPdateDue = req.body.pPdateDue;
+    var pRecruitStart = req.body.pRecruitStart;
+    var pRecruitDue = req.body.pRecruitDue;
+    var pStart = req.body.pStart;
+    var pDue = req.body.pDue;
     var pPlan = req.body.pPlan;
     var pDesign = req.body.pDesign;
-    var pAndroid = req.body.pAndroid;
     var pIos = req.body.pIos;
+    var pAos = req.body.pAos;
     var pGame = req.body.pGame;
     var pWeb = req.body.pWeb;
     var pServer = req.body.pServer;
+    var pDescription = req.body.pDescription;
+    var pOnOff = req.body.pOnOff;
+    var pGender = req.body.pGender;
+    var pAcademic = req.body.pAcademic;
+    var pPlanf = req.body.pPlanf;
+    var pDesignf = req.body.pDesignf;
+    var pIosf = req.body.pIosf;
+    var pAosf = req.body.pAosf;
+    var pGamef = req.body.pGamef;
+    var pWebf = req.body.pWebf;
+    var pServerf = req.body.pServerf;
     var mNum = req.body.mNum;
     
     ProjectInfo.create({
         pTitle: pTitle,
         pType: pType,
-        pRdateStart: pRdateStart,
-        pRdateDue: pRdateDue,
-        pPdateStart: pPdateStart,
-        pPdateDue: pPdateDue,
+        pRecruitStart: pRecruitStart,
+        pRecruitDue: pRecruitDue,
+        pStart: pStart,
+        pDue: pDue,
         pPlan: pPlan,
         pDesign: pDesign,
-        pAndroid: pAndroid,
+        pAos: pAos,
         pIos: pIos,
         pGame: pGame,
         pWeb: pWeb,
         pServer: pServer,
+        pDescription: pDescription,
+        pOnOff: pOnOff,
+        pGender: pGender,
+        pAcademic: pAcademic,
+        pPlanf: pPlanf,
+        pDesignf: pDesignf,
+        pIosf: pIosf,
+        pAosf: pAosf,
+        pGamef: pGamef,
+        pWebf: pWebf,
+        pServerf: pServerf,
+        pStatus: 0,
         mNum: mNum,
-        pStatus: 0
     })
     .then(()=>{
         var message = "프로젝트 모집 공고가 등록되었습니다."
@@ -320,4 +346,270 @@ app.post('/delProject', function(req, res) {
     .catch((err)=>{
         console.log(err);
     });
+});
+
+//프로젝트 지원
+app.post('/apply', function(req, res) {
+    var mNum = req.body.mNum;
+    var pNum = req.body.pNum;
+
+    Recruit.create({
+        mNum: mNum,
+        pNum: pNum,
+        rApproval: 0
+    })
+    .then(()=> {
+        var message = "지원이 완료되었습니다";
+        res.json({
+            "code": 201,
+            "message": message
+        })
+    })
+    .catch((SequelizeUniqueConstraintError)=> {
+        var message = "이미 지원한 프로젝트입니다"
+            res.json({
+                "code": 202,
+                "message": message
+            })
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+});
+
+//홈
+app.post('/home', async function(req, res) {
+    var mNum = req.body.mNum;
+    var mPosition = req.body.mPosition;
+    var mLevel = req.body.mLevel;
+    var list_belong = [];
+    //소속 플젝
+    var projectInfoList1 = await ProjectInfo.findAll({
+        include: [{
+            where : {
+                mNum: mNum,
+                rApproval: 1
+            },
+            model: Recruit,
+        }]
+    });
+    if(projectInfoList1.length < 3) {
+        list_belong = projectInfoList1;
+    }
+    else {
+        list_belong = projectInfoList1.slice(0, 3);
+    }
+
+    //추천 플젝
+    var projectInfoList2 = [];
+    var list_recommend = [];
+    switch(mPosition) {
+        case 0:
+            projectInfoList2 = await ProjectInfo.findAll({
+                where: {
+                    pPlan: { [Op.gte]: 1},
+                    [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}]
+                }
+            });
+        case 1:
+            projectInfoList2 = await ProjectInfo.findAll({
+                where: {
+                    pDesign: { [Op.gte]: 1},
+                    [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}]
+                }
+            });
+        case 2:
+            projectInfoList2 = await ProjectInfo.findAll({
+                where: {
+                    pIos: { [Op.gte]: 1},
+                    [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}]
+                }
+            });
+        case 3:
+            projectInfoList2 = await ProjectInfo.findAll({
+                where: {
+                    pAos: { [Op.gte]: 1},
+                    [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}]
+                }
+            });
+        case 4:
+            projectInfoList2 = await ProjectInfo.findAll({
+                where: {
+                    pGame: { [Op.gte]: 1},
+                    [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}]
+                }
+            });
+        case 5:
+            projectInfoList2 = await ProjectInfo.findAll({
+                where: {
+                    pWeb: { [Op.gte]: 1},
+                    [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}]
+                }
+            });
+        case 6:
+            projectInfoList2 = await ProjectInfo.findAll({
+                where: {
+                    pServer: { [Op.gte]: 1},
+                    [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}]
+                }
+            });
+    };
+    if(projectInfoList2.length < 3) {
+        list_recommend = projectInfoList2;
+    }
+    else {
+        list_recommend = projectInfoList2.slice(0, 3);
+    }
+
+    res.json({
+        "code": 201,
+        "list_belong": list_belong,
+        "list_recommend": list_recommend
+    });
+});
+
+
+//소속 프로젝트 전체 보기
+app.post('/getbelongedProject', function(req, res) {
+    var mNum = req.body.mNum;
+    
+    ProjectInfo.findAll({
+        include: [{
+            where : {
+                mNum: mNum,
+                rApproval: 1
+            },
+            model: Recruit,
+        }]
+    })
+    .then((projectInfoList)=>{
+        console.log(projectInfoList);
+        res.json({
+            "projectInfoList": projectInfoList
+        });
+    })
+    .catch((err)=>{
+        console.log(err);
+    });
+});
+
+//추천 프로젝트 전체 보기
+app.post('/getRecommenedProject', function(req, res){
+    var mPosition = req.body.mPosition;
+    var mLevel = req.body.mLevel;
+
+    switch(mPosition) {
+        case 0:
+            ProjectInfo.findAll({
+                where: {
+                    pPlan: { [Op.gte]: 1},
+                    [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}]
+                }
+            })
+            .then((projectInfoList)=>{
+                res.json({
+                    "code": 201,
+                    "projectInfoList": projectInfoList
+                })
+            })
+            .catch((err)=>{
+                console.log(err);
+            });
+        case 1:
+            ProjectInfo.findAll({
+                where: {
+                    pDesign: { [Op.gte]: 1},
+                    [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}]
+                }
+            })
+            .then((projectInfoList)=>{
+                res.json({
+                    "code": 201,
+                    "projectInfoList": projectInfoList
+                })
+            })
+            .catch((err)=>{
+                console.log(err);
+            });
+        case 2:
+            ProjectInfo.findAll({
+                where: {
+                    pIos: { [Op.gte]: 1},
+                    [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}]
+                }
+            })
+            .then((projectInfoList)=>{
+                res.json({
+                    "code": 201,
+                    "projectInfoList": projectInfoList
+                })
+            })
+            .catch((err)=>{
+                console.log(err);
+            });
+        case 3:
+            ProjectInfo.findAll({
+                where: {
+                    pAos: { [Op.gte]: 1},
+                    [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}]
+                }
+            })
+            .then((projectInfoList)=>{
+                res.json({
+                    "code": 201,
+                    "projectInfoList": projectInfoList
+                })
+            })
+            .catch((err)=>{
+                console.log(err);
+            });
+        case 4:
+            ProjectInfo.findAll({
+                where: {
+                    pGame: { [Op.gte]: 1},
+                    [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}]
+                }
+            })
+            .then((projectInfoList)=>{
+                res.json({
+                    "code": 201,
+                    "projectInfoList": projectInfoList
+                })
+            })
+            .catch((err)=>{
+                console.log(err);
+            });
+        case 5:
+            ProjectInfo.findAll({
+                where: {
+                    pWeb: { [Op.gte]: 1},
+                    [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}]
+                }
+            })
+            .then((projectInfoList)=>{
+                res.json({
+                    "code": 201,
+                    "projectInfoList": projectInfoList
+                })
+            })
+            .catch((err)=>{
+                console.log(err);
+            });
+        case 6:
+            ProjectInfo.findAll({
+                where: {
+                    pServer: { [Op.gte]: 1},
+                    [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}]
+                }
+            })
+            .then((projectInfoList)=>{
+                res.json({
+                    "code": 201,
+                    "projectInfoList": projectInfoList
+                })
+            })
+            .catch((err)=>{
+                console.log(err);
+            });
+    };
 });

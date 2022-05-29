@@ -15,7 +15,7 @@ module.exports = class Zzim extends Sequelize.Model {
             sequelize,
             timestamps: false,
             modelName: 'Zzim',
-            tableName: 'zzim',
+            tableName: 'zzims',
             paranoid: false,
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',

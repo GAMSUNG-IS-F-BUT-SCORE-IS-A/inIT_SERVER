@@ -15,7 +15,7 @@ module.exports = class TodoManager extends Sequelize.Model{
             sequelize,
             timestamps: false,
             modelName: 'TodoManager',
-            tableName: 'todomanager',
+            tableName: 'todomanagers',
             paranoid: false,
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci'

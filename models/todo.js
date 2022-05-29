@@ -32,7 +32,7 @@ module.exports = class Todo extends Sequelize.Model {
             sequelize,
             timestamps: false,
             modelName: 'Todo',
-            tableName: 'todo',
+            tableName: 'todos',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });

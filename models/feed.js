@@ -38,7 +38,7 @@ module.exports = class Feed extends Sequelize.Model {
             sequelize,
             timestamps: false,
             modelName: 'Feed',
-            tableName: 'feed',
+            tableName: 'feeds',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });

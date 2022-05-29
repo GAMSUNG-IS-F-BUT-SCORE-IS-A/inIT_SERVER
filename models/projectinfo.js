@@ -117,7 +117,7 @@ module.exports = class ProjectInfo extends Sequelize.Model {
             sequelize,
             timestamps: false,
             modelName: 'ProjectInfo',
-            tableName: 'projectinfo',
+            tableName: 'projectinfos',
             paranoid: false,
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
@@ -126,7 +126,8 @@ module.exports = class ProjectInfo extends Sequelize.Model {
 
     static associate(db) { 
         db.ProjectInfo.belongsTo(db.Member, {foreignKey: 'mNum', targetKey: 'mNum'});
-        db.ProjectInfo.hasMany(db.Zzim, {foreignKey: 'pNum', sourceKey: 'pNum'});
+        db.ProjectInfo.belongsToMany(db.Member, {through: 'Zzim'});
+        //db.ProjectInfo.belongsToMany(db.Member, {through: 'Recruit'});
         db.ProjectInfo.hasMany(db.Recruit, {foreignKey: 'pNum', sourceKey: 'pNum'});
         db.ProjectInfo.hasMany(db.Feed, {foreignKey: 'pNum', sourceKey: 'pNum'});
         db.ProjectInfo.hasMany(db.Todo, {foreignKey: 'pNum', sourceKey: 'pNum'});
