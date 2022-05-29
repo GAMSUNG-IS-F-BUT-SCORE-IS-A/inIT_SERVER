@@ -386,6 +386,7 @@ app.post('/home', async function(req, res) {
     var list_belong = [];
     //소속 플젝
     var projectInfoList1 = await ProjectInfo.findAll({
+        attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
         include: [{
             where : {
                 mNum: mNum,
@@ -400,6 +401,19 @@ app.post('/home', async function(req, res) {
     else {
         list_belong = projectInfoList1.slice(0, 3);
     }
+
+    //소속 프로젝트 공고 작성자
+    var writerInfo_belong = [];
+    for(var i = 0; i < list_belong.length; i++) {
+        
+        writerInfo_belong[i] = await Member.findAll({
+            attributes: ['mNum','mName'],
+            where: {
+                mNum: list_belong[i].mNum
+            }
+        });
+    }
+    
 
     //추천 플젝
     var projectInfoList2 = [];
@@ -462,25 +476,75 @@ app.post('/home', async function(req, res) {
         list_recommend = projectInfoList2.slice(0, 3);
     }
 
+    //추천 플젝 공고 작성자
+    var writerInfo_recommend = [];
+    for(var i = 0; i < list_recommend.length; i++) {
+        
+        writerInfo_recommend[i] = await Member.findAll({
+            attributes: ['mNum','mName'],
+            where: {
+                mNum: list_recommend[i].mNum
+            }
+        });
+    }
+
     res.json({
         "code": 201,
         "list_belong": list_belong,
-        "list_recommend": list_recommend
+        "writerInfo_belong": writerInfo_belong,
+        "list_recommend": list_recommend,
+        "writerInfo_recommend": writerInfo_recommend
     });
 });
 
 
 //소속 프로젝트 전체 보기
-app.post('/getbelongedProject', function(req, res) {
-    var mNum = req.body.mNum;
-    
-    ProjectInfo.findAll({
+app.post('/getbelongedProject', async function(req, res) {
+    var mNum = req.body.mNum; //로그인 한 사용자
+
+    //로그인한 사용자가 소속된 프로젝트 정보
+    var pInfo = await ProjectInfo.findAll({
+        attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
         include: [{
+            model: Recruit,
             where : {
                 mNum: mNum,
                 rApproval: 1
             },
+        }]
+    });
+
+    //프로젝트 작성자 이름
+    var writerNum = [];
+    var writerInfo = [];
+    for(var i = 0; i < pInfo.length; i++) {
+        writerNum[i] = pInfo[i].mNum;
+
+        writerInfo[i] = await Member.findAll({
+            attributes: ['mNum','mName'],
+            where: {
+                mNum: writerNum[i]
+            }
+        });
+    };
+
+    res.json({
+        "pInfo": pInfo,
+        "writerInfo": writerInfo
+    });
+
+    
+    
+    /*
+    ProjectInfo.findAll({
+        attributes: ['ProjectInfo.pNum', 'ProjectInfo.pTitle', 'ProjectInfo.pType', 'ProjectInfo.pOnOff', 'ProjectInfo.pStart', 
+        'ProjectInfo.pDue', 'ProjectInfo.pState', ],
+        include: [{
             model: Recruit,
+            where : {
+                mNum: mNum,
+                rApproval: 1
+            },
         }]
     })
     .then((projectInfoList)=>{
@@ -492,125 +556,87 @@ app.post('/getbelongedProject', function(req, res) {
     .catch((err)=>{
         console.log(err);
     });
+    */
 });
 
 //추천 프로젝트 전체 보기
-app.post('/getRecommenedProject', function(req, res){
+app.post('/getRecommenedProject', async function(req, res){
     var mPosition = req.body.mPosition;
     var mLevel = req.body.mLevel;
+    var pInfo = [];
+    var writerInfo = [];
 
     switch(mPosition) {
         case 0:
-            ProjectInfo.findAll({
+            pInfo = await ProjectInfo.findAll({
+                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pPlan: { [Op.gte]: 1},
                     [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}]
                 }
-            })
-            .then((projectInfoList)=>{
-                res.json({
-                    "code": 201,
-                    "projectInfoList": projectInfoList
-                })
-            })
-            .catch((err)=>{
-                console.log(err);
             });
         case 1:
-            ProjectInfo.findAll({
+            pInfo = await ProjectInfo.findAll({
+                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pDesign: { [Op.gte]: 1},
                     [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}]
                 }
-            })
-            .then((projectInfoList)=>{
-                res.json({
-                    "code": 201,
-                    "projectInfoList": projectInfoList
-                })
-            })
-            .catch((err)=>{
-                console.log(err);
             });
         case 2:
-            ProjectInfo.findAll({
+            pInfo = await ProjectInfo.findAll({
+                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pIos: { [Op.gte]: 1},
                     [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}]
                 }
-            })
-            .then((projectInfoList)=>{
-                res.json({
-                    "code": 201,
-                    "projectInfoList": projectInfoList
-                })
-            })
-            .catch((err)=>{
-                console.log(err);
             });
         case 3:
-            ProjectInfo.findAll({
+            pInfo = await ProjectInfo.findAll({
+                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pAos: { [Op.gte]: 1},
                     [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}]
                 }
-            })
-            .then((projectInfoList)=>{
-                res.json({
-                    "code": 201,
-                    "projectInfoList": projectInfoList
-                })
-            })
-            .catch((err)=>{
-                console.log(err);
             });
         case 4:
-            ProjectInfo.findAll({
+            pInfo = await ProjectInfo.findAll({
+                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pGame: { [Op.gte]: 1},
                     [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}]
                 }
-            })
-            .then((projectInfoList)=>{
-                res.json({
-                    "code": 201,
-                    "projectInfoList": projectInfoList
-                })
-            })
-            .catch((err)=>{
-                console.log(err);
             });
         case 5:
-            ProjectInfo.findAll({
+            pInfo = await ProjectInfo.findAll({
+                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pWeb: { [Op.gte]: 1},
                     [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}]
                 }
-            })
-            .then((projectInfoList)=>{
-                res.json({
-                    "code": 201,
-                    "projectInfoList": projectInfoList
-                })
-            })
-            .catch((err)=>{
-                console.log(err);
             });
         case 6:
-            ProjectInfo.findAll({
+            pInfo = await ProjectInfo.findAll({
+                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pServer: { [Op.gte]: 1},
                     [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}]
                 }
-            })
-            .then((projectInfoList)=>{
-                res.json({
-                    "code": 201,
-                    "projectInfoList": projectInfoList
-                })
-            })
-            .catch((err)=>{
-                console.log(err);
             });
     };
+    //작성자 정보
+    for(var i = 0; i < pInfo.length; i++) {
+        
+        writerInfo[i] = await Member.findAll({
+            attributes: ['mNum','mName'],
+            where: {
+                mNum: pInfo[i].mNum
+            }
+        });
+    }
+
+    res.json({
+        "pInfo": pInfo,
+        "writerInfo": writerInfo
+    });
 });
