@@ -386,7 +386,6 @@ app.post('/home', async function(req, res) {
     var list_belong = [];
     //소속 플젝
     var projectInfoList1 = await ProjectInfo.findAll({
-        attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
         include: [{
             where : {
                 mNum: mNum,
