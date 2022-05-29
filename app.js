@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const multer = require('multer');
 const dotenv = require('dotenv');
 
 //시퀄라이저
