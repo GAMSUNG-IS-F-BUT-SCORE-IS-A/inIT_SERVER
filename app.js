@@ -15,6 +15,7 @@ const { Op } = require('sequelize');
 const Member = require('./models/members');
 const ProjectInfo = require('./models/projectinfo');
 const Recruit = require("./models/recruit");
+const Stack = require('./models/stack');
 //const { where } = require('sequelize/types');
 //const { Model } = require('sequelize/types');
 
@@ -56,7 +57,7 @@ app.use(session({
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '192.168.0.3', (err)=> {
+app.listen(3006, '192.168.0.15', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -197,35 +198,6 @@ app.post('/idCheck', function(req, res) {
         }
     })
     .catch((err)=> {
-        console.log(err);
-    });
-});
-
-//회원 정보 수정
-app.post('/modifyBasicInfo', function(req, res) {
-    var mNum = req.body.mNum;
-    var mEmail = req.body.mEmail;
-    var mDept = req.body.mDept;
-    var mAcademic = req.body.mAcademic;
-    var mGender = req.body.mGender;
-
-    Member.update({
-        mEmail: mEmail,
-        mDept: mDept,
-        mAcademic: mAcademic,
-        mGender: mGender,
-        mApproval: 0,
-    }, {
-        where: {mNum: mNum}
-    })
-    .then(()=>{
-        var message = "회원 정보 수정이 완료되었습니다.";
-        res.json({
-            "code": 201,
-            "message": message,
-        })
-    })
-    .catch((err)=>{
         console.log(err);
     });
 });
@@ -487,6 +459,8 @@ app.post('/home', async function(req, res) {
         });
     }
 
+    console.log(list_belong[0]);
+
     res.json({
         "code": 201,
         "list_belong": list_belong,
@@ -532,30 +506,6 @@ app.post('/getbelongedProject', async function(req, res) {
         "writerInfo": writerInfo
     });
 
-    
-    
-    /*
-    ProjectInfo.findAll({
-        attributes: ['ProjectInfo.pNum', 'ProjectInfo.pTitle', 'ProjectInfo.pType', 'ProjectInfo.pOnOff', 'ProjectInfo.pStart', 
-        'ProjectInfo.pDue', 'ProjectInfo.pState', ],
-        include: [{
-            model: Recruit,
-            where : {
-                mNum: mNum,
-                rApproval: 1
-            },
-        }]
-    })
-    .then((projectInfoList)=>{
-        console.log(projectInfoList);
-        res.json({
-            "projectInfoList": projectInfoList
-        });
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
-    */
 });
 
 //추천 프로젝트 전체 보기
@@ -568,7 +518,6 @@ app.post('/getRecommenedProject', async function(req, res){
     switch(mPosition) {
         case 0:
             pInfo = await ProjectInfo.findAll({
-                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pPlan: { [Op.gte]: 1},
                     [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}]
@@ -576,7 +525,6 @@ app.post('/getRecommenedProject', async function(req, res){
             });
         case 1:
             pInfo = await ProjectInfo.findAll({
-                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pDesign: { [Op.gte]: 1},
                     [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}]
@@ -584,7 +532,6 @@ app.post('/getRecommenedProject', async function(req, res){
             });
         case 2:
             pInfo = await ProjectInfo.findAll({
-                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pIos: { [Op.gte]: 1},
                     [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}]
@@ -592,7 +539,6 @@ app.post('/getRecommenedProject', async function(req, res){
             });
         case 3:
             pInfo = await ProjectInfo.findAll({
-                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pAos: { [Op.gte]: 1},
                     [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}]
@@ -600,7 +546,6 @@ app.post('/getRecommenedProject', async function(req, res){
             });
         case 4:
             pInfo = await ProjectInfo.findAll({
-                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pGame: { [Op.gte]: 1},
                     [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}]
@@ -608,7 +553,6 @@ app.post('/getRecommenedProject', async function(req, res){
             });
         case 5:
             pInfo = await ProjectInfo.findAll({
-                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pWeb: { [Op.gte]: 1},
                     [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}]
@@ -616,13 +560,13 @@ app.post('/getRecommenedProject', async function(req, res){
             });
         case 6:
             pInfo = await ProjectInfo.findAll({
-                attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
                 where: {
                     pServer: { [Op.gte]: 1},
                     [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}]
                 }
             });
     };
+    
     //작성자 정보
     for(var i = 0; i < pInfo.length; i++) {
         
@@ -637,5 +581,120 @@ app.post('/getRecommenedProject', async function(req, res){
     res.json({
         "pInfo": pInfo,
         "writerInfo": writerInfo
+    });
+});
+
+//마이페이지 내 정보 불러오기
+app.post('/myPage', async function(req, res){
+    var mNum = req.body.mNum;
+
+    var mInfo = await Member.findOne({
+        where:{
+            mNum: mNum
+        }
+    });
+
+    var stacks = await Stack.findAll({
+        attributes: ['sStack'],
+        where:{
+            mNum: mNum
+        }
+    });
+
+    res.json({
+        "code": 201,
+        "mInfo": mInfo,
+        "stacks": stacks
+    });
+});
+
+//기본정보 수정
+app.post('/editBasicInfo', async function(req, res) {
+    var mNum = req.body.mNum;
+    var mEmail = req.body.mEmail;
+    var mDept = req.body.mDept;
+    var mAcademic = req.body.mAcademic;
+    var mGender = req.body.mGender;
+
+    Member.update(
+        {mEmail: mEmail,
+        mDept: mDept,
+        mAcademic: mAcademic,
+        mGender: mGender},
+        {where: {
+            mNum: mNum
+        }})
+        .then(()=>{
+            var message = "회원정보가 수정되었습니다."
+            var result = true;
+
+            res.json({
+                "code": 201,
+                "message": message,
+                "result": result
+            });
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+});
+
+//링크 수정
+app.post('/updateLink', async function(req, res){
+    var mNum = req.body.mNum;
+    var mGit = req.body.mGit;
+    var mNotion = req.body.mNotion;
+    var mBlog = req.body.mBlog;
+
+    Member.update({
+        mGit: mGit,
+        mNotion: mNotion,
+        mBlog: mBlog
+    }, {
+        where: {
+            mNum: mNum
+        }
+    })
+    .then(()=>{
+        var message = "링크 정보가 수정되었습니다";
+        var result = true;
+        res.json({
+            "code": 201,
+            "message": message,
+            "result": result
+        })
+    })
+    .catch((err)=>{
+        console.log(err);
+    });
+});
+
+//프로필 수정
+app.post('/updateProfile', async function(req, res){
+    var mNum = req.body.mNum;
+    var mName = req.body.mName;
+    var mPosition = req.body.mPosition;
+    var mLevel = req.body.mLevel;
+    var mIntroduction = req.body.mIntroduction;
+
+    Member.update({
+        mName: mName,
+        mPosition: mPosition,
+        mLevel: mLevel,
+        mIntroduction: mIntroduction
+    }, {
+        where: {mNum: mNum}
+    })
+    .then(()=>{
+        var message = "프로필이 수정되었습니다."
+        var result = true;
+        res.json({
+            "code": 201,
+            "message": message,
+            "result": result
+        })
+    })
+    .catch((err)=>{
+        console.log(err);
     });
 });
