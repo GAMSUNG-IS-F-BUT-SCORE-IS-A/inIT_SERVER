@@ -813,3 +813,15 @@ app.post('/deleteFeed', async function(req, res) {
         console.log(err);
     })
 });
+
+//피드 전체 보기
+app.get('/getAllFeed', async function(req, res){
+    var feeds = await Feed.findAll({
+        attributes: ['fNum', 'fTitle', 'fPhoto']
+    });
+
+    res.json({
+        "code": 201,
+        "feeds": feeds
+    });
+})
