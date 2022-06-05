@@ -81,8 +81,9 @@ module.exports = class Member extends Sequelize.Model {
     static associate(db) {
         db.Member.hasMany(db.ProjectInfo, {foreignKey: 'mNum', sourceKey: 'mNum'});
         db.Member.hasMany(db.Stack, {foreignKey: 'mNum', sourcekey: 'mNum'});
-        db.Member.belongsToMany(db.ProjectInfo, {through: 'Zzim'});
+        //db.Member.belongsToMany(db.ProjectInfo, {through: 'Zzim'});
         //db.Member.belongsToMany(db.ProjectInfo, {through: 'Recruit'});
+        db.Member.hasMany(db.Zzim, {foreignKey: 'mNum', sourceKey: 'mNum'});
         db.Member.hasMany(db.Recruit, {foreignKey: 'mNum', sourceKey: 'mNum'});
         db.Member.hasMany(db.Feed, {foreignKey: 'mNum', sourceKey: 'mNum'});
         db.Member.belongsToMany(db.Todo, {through: 'TodoManager'})

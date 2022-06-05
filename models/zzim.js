@@ -10,6 +10,11 @@ module.exports = class Zzim extends Sequelize.Model {
             pNum: {
                 type: Sequelize.INTEGER,
                 allowNull: false
+            },
+            zNum : {
+                type: Sequelize.INTEGER,
+                autoIncrement: true,
+                primaryKey: true
             }
         }, {
             sequelize,

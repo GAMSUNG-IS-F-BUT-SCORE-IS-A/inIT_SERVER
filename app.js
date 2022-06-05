@@ -17,6 +17,7 @@ const ProjectInfo = require('./models/projectinfo');
 const Recruit = require("./models/recruit");
 const Stack = require('./models/stack');
 const Feed = require('./models/feed');
+const Zzim = require('./models/zzim');
 //const { where } = require('sequelize/types');
 //const { Model } = require('sequelize/types');
 
@@ -702,6 +703,45 @@ app.post('/updateProfile', async function(req, res){
     });
 });
 
+//마이페이지: 참여한 프로젝트 개수
+app.post('/countProject', async function(req, res) {
+    var mNum = req.body.mNum;
+
+    var joinedProject = await Recruit.findAll({
+        where: {
+            mNum: mNum,
+            rApproval: 1
+        }
+    });
+
+    var uploadProject = await ProjectInfo.findAll({
+        where: {
+            mNum: mNum
+        }
+    });
+
+    var standBy = await Recruit.findAll({
+        where: {
+            mNum: mNum,
+            rApproval: 0
+        }
+    });
+
+    var zzimProject = await Zzim.findAll({
+        where :{
+            mNum: mNum
+        }
+    });
+
+    res.json({
+        "code": 201,
+        "join": joinedProject.length,
+        "upload": uploadProject.length,
+        "disapproval": standBy.length,
+        "zzim": zzimProject.length
+    });
+});
+
 //피드 작성용 바텀시트
 app.post('/finishedProject', async function(req, res) {
     var mNum = req.body.mNum;
@@ -772,4 +812,4 @@ app.post('/deleteFeed', async function(req, res) {
     .catch((err)=>{
         console.log(err);
     })
-})
+});
