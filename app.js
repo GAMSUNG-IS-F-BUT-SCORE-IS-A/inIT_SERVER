@@ -11,7 +11,7 @@ const dotenv = require('dotenv');
 //시퀄라이저
 //const { sequelize, Recruit } = require('./models');
 const { sequelize } = require('./models');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const Member = require('./models/members');
 const ProjectInfo = require('./models/projectinfo');
 const Recruit = require("./models/recruit");
@@ -311,6 +311,29 @@ app.post('/addProject', function(req, res) {
 //프로젝트 상세보기
 app.post('/detailProject', async function(req, res){
     var pNum = req.body.pNum;
+
+    //프로젝트 정보
+    var projectInfo = await ProjectInfo.findOne({
+        where: {pNum: pNum}
+    });
+    //스택 파싱
+    var stacks = projectInfo.pStack.split(',');
+    projectInfo.pStack = stacks;
+
+    //작성자 정보
+    var writer = projectInfo.mNum;
+    var writerInfo = await Member.findOne({
+        attributes: ['mNum', 'mName', 'mPosition', 'mPhoto'],
+        where : {
+            mNum: writer
+        }
+    });
+
+    res.json({
+        "code": 201,
+        "projectInfo": projectInfo,
+        "writerInfo": writerInfo
+    });
 });
 
 //프로젝트 공고 삭제
