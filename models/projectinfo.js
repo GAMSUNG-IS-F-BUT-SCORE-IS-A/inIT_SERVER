@@ -113,6 +113,9 @@ module.exports = class ProjectInfo extends Sequelize.Model {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
+            pStack: {
+                type: Sequelize.TEXT
+            }
         }, {
             sequelize,
             timestamps: false,

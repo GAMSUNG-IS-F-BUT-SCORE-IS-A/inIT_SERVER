@@ -16,6 +16,7 @@ const Member = require('./models/members');
 const ProjectInfo = require('./models/projectinfo');
 const Recruit = require("./models/recruit");
 const Stack = require('./models/stack');
+const Feed = require('./models/feed');
 //const { where } = require('sequelize/types');
 //const { Model } = require('sequelize/types');
 
@@ -57,7 +58,7 @@ app.use(session({
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '192.168.0.15', (err)=> {
+app.listen(3006, '192.168.0.5', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -263,6 +264,7 @@ app.post('/addProject', function(req, res) {
     var pWebf = req.body.pWebf;
     var pServerf = req.body.pServerf;
     var mNum = req.body.mNum;
+    var pStack = req.body.pStack;
     
     ProjectInfo.create({
         pTitle: pTitle,
@@ -291,6 +293,7 @@ app.post('/addProject', function(req, res) {
         pServerf: pServerf,
         pStatus: 0,
         mNum: mNum,
+        pStack: pStack,
     })
     .then(()=>{
         var message = "프로젝트 모집 공고가 등록되었습니다."
@@ -698,3 +701,75 @@ app.post('/updateProfile', async function(req, res){
         console.log(err);
     });
 });
+
+//피드 작성용 바텀시트
+app.post('/finishedProject', async function(req, res) {
+    var mNum = req.body.mNum;
+
+    var project = await ProjectInfo.findAll({
+        attributes: ['pNum', 'pTitle'],
+        include: [{
+            where: {
+                mNum: mNum,
+                rApproval: 1,
+            },
+            model: Recruit
+        }],
+        where: {
+            pState: 2
+        }
+    });
+
+    res.json({
+        "code": 201,
+        "project": project
+    })
+});
+
+//피드 작성
+app.post('/addFeed', async function(req, res){
+    var fTitle = req.body.fTitle;
+    var fType = req.body.fType;
+    var fPhoto = req.body.fPhoto;
+    var fDescription = req.body.fDescription;
+    var fLink = req.body.fLink;
+    var mNum = req.body.mNum;
+    var pNum = req.body.pNum;
+
+    Feed.create({
+        fTitle: fTitle,
+        fType: fType,
+        fPhoto: fPhoto,
+        fDescription: fDescription,
+        fLink: fLink,
+        mNum: mNum,
+        pNum: pNum
+    })
+    .then(()=>{
+        var message = "피드 등록이 완료되었습니다";
+        res.json({
+            "code": 201,
+            "message": message
+        })
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+});
+
+//피드 삭제
+app.post('/deleteFeed', async function(req, res) {
+    var fNum = req.body.fNum;
+
+    Feed.destroy({ where: {fNum: fNum}})
+    .then(()=>{
+        var message = "피드가 삭제되었습니다";
+        res.json({
+            "code": 201,
+            "message": message
+        })
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+})

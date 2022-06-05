@@ -6,16 +6,23 @@ module.exports = class Recruit extends Sequelize.Model {
             mNum: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                primaryKey: true
             },
             pNum: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                primaryKey: true
             },
             rApproval: {
                 type: Sequelize.INTEGER,
                 allowNull: false
+            },
+            rPosition: {
+                type: Sequelize.INTEGER,
+                allowNull: false
+            },
+            rNum: {
+                type: Sequelize.INTEGER,
+                primaryKey: true,
+                autoIncrement: true
             }
         }, {
             sequelize,
