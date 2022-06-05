@@ -306,7 +306,12 @@ app.post('/addProject', function(req, res) {
     .catch((err)=>{
         console.log(err);
     })
-})
+});
+
+//프로젝트 상세보기
+app.post('/detailProject', async function(req, res){
+    var pNum = req.body.pNum;
+});
 
 //프로젝트 공고 삭제
 app.post('/delProject', function(req, res) {
@@ -329,11 +334,13 @@ app.post('/delProject', function(req, res) {
 app.post('/apply', function(req, res) {
     var mNum = req.body.mNum;
     var pNum = req.body.pNum;
+    var rPosition = req.body.rPosition;
 
     Recruit.create({
         mNum: mNum,
         pNum: pNum,
-        rApproval: 0
+        rApproval: 0,
+        rPosition: rPosition
     })
     .then(()=> {
         var message = "지원이 완료되었습니다";
@@ -824,4 +831,4 @@ app.get('/getAllFeed', async function(req, res){
         "code": 201,
         "feeds": feeds
     });
-})
+});
