@@ -59,7 +59,7 @@ app.use(session({
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '192.168.0.5', (err)=> {
+app.listen(3006, '192.168.0.17', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -628,12 +628,19 @@ app.post('/myPage', async function(req, res){
         }
     });
 
-    var stacks = await Stack.findAll({
+    var stacksArr = await Stack.findAll({
         attributes: ['sStack'],
         where:{
             mNum: mNum
         }
     });
+
+    const stacks = [];
+    for(var i = 0; i<stacksArr.length; i++) {
+        stacks.push(stacksArr[i].sStack);
+    }
+
+    //const stack = stacks.reverse().join();
 
     res.json({
         "code": 201,
