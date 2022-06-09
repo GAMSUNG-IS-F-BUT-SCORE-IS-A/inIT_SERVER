@@ -793,34 +793,21 @@ app.post('/updateLink', async function(req, res){
 });
 
 //프로필 수정
-app.post('/updateProfile', async function(req, res){
+app.post('/updateProfile', upload.single('mPhoto'), async function(req, res){
     var mNum = req.body.mNum;
     var mName = req.body.mName;
     var mPosition = req.body.mPosition;
     var mLevel = req.body.mLevel;
     var mIntroduction = req.body.mIntroduction;
     
-    //파일 이름 mNum.png로 받기
-    try{
-        const file = req.file;
-        if(file) {
-            var originalName = file.originalname;
-            var fileName = file.filename;
-            var mimeType = file.mimetype;
-            var size = file.size;
-        }
-    } catch(err) {
-        console.log(err);
-    }
-
-    const img = readImageFile('./uploads/' + mNum);
+    var imgData = readImageFile('./uploads/'+req.file.filename);
 
     Member.update({
         mName: mName,
         mPosition: mPosition,
         mLevel: mLevel,
         mIntroduction: mIntroduction,
-        mPhoto: img
+        mPhoto: imgData
     }, {
         where: {mNum: mNum}
     })
