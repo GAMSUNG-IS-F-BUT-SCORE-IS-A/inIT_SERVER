@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const multer = require('multer');
+const fs = require('fs');
 const dotenv = require('dotenv');
 
 //시퀄라이저
@@ -54,6 +55,19 @@ app.use(session({
     },
     name: 'session-cookie',
 }));
+
+//이미지 저장 서버 디스크 생성
+const _storage = multer.diskStorage({
+    destination: 'uploads/',
+    filename: function(req, file, cb) {
+        return crypto.pseudoRandomBytes(16, function(err, raw) {
+            if(err) {
+                return cb(err);
+            }
+            return cb(null, file.originalname);
+        })
+    }
+})
 
 
 //서버 실행
@@ -711,18 +725,39 @@ app.post('/updateLink', async function(req, res){
 });
 
 //프로필 수정
-app.post('/updateProfile', async function(req, res){
+app.post('/updateProfile', multer({storage: _storage}).single('file'), async function(req, res){
     var mNum = req.body.mNum;
     var mName = req.body.mName;
     var mPosition = req.body.mPosition;
     var mLevel = req.body.mLevel;
     var mIntroduction = req.body.mIntroduction;
+    //이미지 처리
+    function readImageFile(file) {
+        const bitmap = fs.readFileSync(file);
+        const buf = new Buffer.from(bitmap);
+        return buf;
+    }
+    //파일 이름 mNum.png로 받기
+    try{
+        const file = req.file;
+        if(file) {
+            var originalName = file.originalname;
+            var fileName = file.filename;
+            var mimeType = file.mimetype;
+            var size = file.size;
+        }
+    } catch(err) {
+        console.log(err);
+    }
+
+    const img = readImageFile('./uploads/' + mNum);
 
     Member.update({
         mName: mName,
         mPosition: mPosition,
         mLevel: mLevel,
-        mIntroduction: mIntroduction
+        mIntroduction: mIntroduction,
+        mPhoto: img
     }, {
         where: {mNum: mNum}
     })
