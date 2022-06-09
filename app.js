@@ -73,7 +73,7 @@ const _storage = multer.diskStorage({
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '192.168.0.17', (err)=> {
+app.listen(3006, '172.18.1.80', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -343,10 +343,24 @@ app.post('/detailProject', async function(req, res){
         }
     });
 
+    //현재 지원이 승인된 사람
+    var approvedMember = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mPhoto'],
+        include: [{
+            attributes: ['rPosition'],
+            where: {
+                pNum: pNum,
+                rApproval: 1
+            },
+            model: Recruit
+        }]
+    });
+
     res.json({
         "code": 201,
         "projectInfo": projectInfo,
-        "writerInfo": writerInfo
+        "writerInfo": writerInfo,
+        "approvedMember": approvedMember
     });
 });
 
