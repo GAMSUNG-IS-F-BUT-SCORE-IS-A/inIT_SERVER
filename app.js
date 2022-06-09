@@ -960,3 +960,22 @@ app.get('/getAllFeed', async function(req, res){
         "feeds": feeds
     });
 });
+
+//피드 상세 보기
+app.post('/detailFeed', async function(req, res){
+    var fNum = req.body.fNum;
+
+    //피드 정보
+    var feedInfo = await Feed.findOne({
+        include: [{
+            attributes: ['mNum', 'mName', 'mPhoto'],
+            model: Member
+        }],
+        where: {fNum: fNum}
+    });
+
+    res.json({
+        "code": 201,
+        "feedInfo": feedInfo
+    });
+});
