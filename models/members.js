@@ -66,6 +66,9 @@ module.exports = class Member extends Sequelize.Model {
                 allowNull: false,
                 defaultValue: 0
             },
+            mStacks: {
+                type: Sequelize.TEXT
+            }
         },
         {
             sequelize,
@@ -80,7 +83,6 @@ module.exports = class Member extends Sequelize.Model {
     }
     static associate(db) {
         db.Member.hasMany(db.ProjectInfo, {foreignKey: 'mNum', sourceKey: 'mNum'});
-        db.Member.hasMany(db.Stack, {foreignKey: 'mNum', sourcekey: 'mNum'});
         //db.Member.belongsToMany(db.ProjectInfo, {through: 'Zzim'});
         //db.Member.belongsToMany(db.ProjectInfo, {through: 'Recruit'});
         db.Member.hasMany(db.Zzim, {foreignKey: 'mNum', sourceKey: 'mNum'});

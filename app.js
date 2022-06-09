@@ -17,7 +17,6 @@ const { Op, where } = require('sequelize');
 const Member = require('./models/members');
 const ProjectInfo = require('./models/projectinfo');
 const Recruit = require("./models/recruit");
-const Stack = require('./models/stack');
 const Feed = require('./models/feed');
 const Zzim = require('./models/zzim');
 //const { where } = require('sequelize/types');
@@ -139,6 +138,7 @@ app.post('/login', function(req, res) {
                     'message': message,
                 })
             }
+            /*
             else if(members[0].mApproval == 2) {
                 members = null;
                 message = "탈퇴한 계정입니다.";
@@ -147,11 +147,11 @@ app.post('/login', function(req, res) {
                     'member': members,
                     'message': message,
                 })
-            }
+            }*/
             else if(members[0].mApproval == 1) {
                 message = members[0].mName + "님 환영합니다.";
                 res.json({
-                    'code': 205,
+                    'code': 204,
                     'member': members,
                     'message': message,
                 })
@@ -359,7 +359,7 @@ app.post('/detailProject', async function(req, res){
         isApproval = false;
     }
     else {
-        switch(approve[0].rApproval) {
+        switch(approve.rApproval) {
             case 0:
                 isApproval = false;
                 break;
@@ -374,8 +374,10 @@ app.post('/detailProject', async function(req, res){
         where: {pNum: pNum}
     });
     //스택 파싱
-    var stacks = projectInfo.pStack.split(',');
-    projectInfo.pStack = stacks;
+    if(projectInfo.pStack != null) {
+        var stacks = projectInfo.pStack.split(',');
+        projectInfo.pStack = stacks;
+    }
 
     //작성자 정보
     var writer = projectInfo.mNum;
@@ -461,34 +463,44 @@ app.post('/delProject', function(req, res) {
 });
 
 //프로젝트 지원
-app.post('/apply', function(req, res) {
+app.post('/apply', async function(req, res) {
     var mNum = req.body.mNum;
     var pNum = req.body.pNum;
     var rPosition = req.body.rPosition;
 
-    Recruit.create({
-        mNum: mNum,
-        pNum: pNum,
-        rApproval: 0,
-        rPosition: rPosition
-    })
-    .then(()=> {
-        var message = "지원이 완료되었습니다";
-        res.json({
-            "code": 201,
-            "message": message
+    var alreadyApply = await Recruit.findAll({
+        where: {
+            mNum: mNum,
+            pNum: pNum,
+            rPosition : rPosition
+        }
+    });
+    if(alreadyApply == null) {
+        Recruit.create({
+            mNum: mNum,
+            pNum: pNum,
+            rApproval: 0,
+            rPosition: rPosition
         })
-    })
-    .catch((SequelizeUniqueConstraintError)=> {
-        var message = "이미 지원한 프로젝트입니다"
+        .then(()=> {
+            var message = "지원이 완료되었습니다";
             res.json({
-                "code": 202,
+                "code": 201,
                 "message": message
             })
-    })
-    .catch((err)=>{
-        console.log(err);
-    })
+        })
+        .catch((err)=>{
+            console.log(err);
+        });
+    }
+    else{
+        var message = "이미 지원한 프로젝트입니다";
+        res.json({
+            "code": 202,
+            "message": message
+        });
+    }
+    
 });
 
 //홈
@@ -749,24 +761,17 @@ app.post('/myPage', async function(req, res){
         }
     });
 
-    var stacksArr = await Stack.findAll({
-        attributes: ['sStack'],
-        where:{
-            mNum: mNum
-        }
-    });
-
-    const stacks = [];
-    for(var i = 0; i<stacksArr.length; i++) {
-        stacks.push(stacksArr[i].sStack);
+    //스택 파싱
+    if(mInfo.mStacks != null) {
+        var stacks = mInfo.mStacks.split(',');
+        mInfo.mStacks = stacks;
     }
 
     //const stack = stacks.reverse().join();
 
     res.json({
         "code": 201,
-        "mInfo": mInfo,
-        "stacks": stacks
+        "mInfo": mInfo
     });
 });
 
@@ -864,7 +869,7 @@ app.post('/updateProfile', upload.single('file'), async function(req, res){
     });
 });
 
-//마이페이지: 참여한 프로젝트 개수
+//마이페이지: 프로젝트 개수
 app.post('/countProject', async function(req, res) {
     var mNum = req.body.mNum;
 
@@ -938,7 +943,6 @@ app.post('/addFeed', upload.single('file'), async function(req, res){
     var pNum = req.body.pNum;
     
 
-    console.log('./uploads/'+req.file.filename);
     //이미지 파일 db에 넣기
     var imgData = readImageFile('./uploads/'+req.file.filename);
 
