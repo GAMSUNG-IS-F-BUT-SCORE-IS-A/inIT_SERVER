@@ -7,7 +7,6 @@ const Zzim = require('./zzim');
 const Stack = require('./stack');
 const Feed = require('./feed');
 const Recruit = require('./recruit');
-const TodoManager = require('./todomanager');
 const Todo = require('./todo');
 const Evaluation = require('./evaluation');
 
@@ -26,7 +25,6 @@ db.Zzim = Zzim;
 db.Stack = Stack;
 db.Feed = Feed;
 db.Recruit = Recruit;
-db.TodoManager = TodoManager;
 db.Todo = Todo;
 db.Evaluation = Evaluation;
 
@@ -36,7 +34,6 @@ Zzim.init(sequelize);
 Stack.init(sequelize);
 Feed.init(sequelize);
 Recruit.init(sequelize);
-TodoManager.init(sequelize);
 Todo.init(sequelize);
 Evaluation.init(sequelize);
 
@@ -46,7 +43,6 @@ Zzim.associate(db);
 Stack.associate(db);
 Feed.associate(db);
 Recruit.associate(db);
-TodoManager.associate(db);
 Todo.associate(db);
 Evaluation.associate(db);
 

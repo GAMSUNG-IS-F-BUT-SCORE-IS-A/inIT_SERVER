@@ -27,6 +27,10 @@ module.exports = class Todo extends Sequelize.Model {
             pNum: {
                 type: Sequelize.INTEGER,
                 allowNull: false
+            },
+            mNums: {
+                type: Sequelize.STRING(50),
+                allowNull: false
             }
         }, {
             sequelize,
@@ -40,6 +44,5 @@ module.exports = class Todo extends Sequelize.Model {
     
     static associate(db) {
         db.Todo.belongsTo(db.ProjectInfo, {foreignKey: 'pNum', targetKey: 'pNum'});
-        db.Todo.hasOne(db.TodoManager, {foreignKey: 'tNum', sourceKey: 'tNum', constraints: false});
     }
 }
