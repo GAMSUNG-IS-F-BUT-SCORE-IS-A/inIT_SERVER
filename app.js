@@ -8,6 +8,7 @@ const session = require('express-session');
 const multer = require('multer');
 const fs = require('fs');
 const crypto = require('crypto');
+const bufferImage = require('buffer-image');
 const dotenv = require('dotenv');
 
 //시퀄라이저
@@ -1009,9 +1010,19 @@ app.post('/detailFeed', async function(req, res){
         where: {fNum: fNum}
     });
 
+    //방법1
+    /*
+    const imageData = feedInfo.fPhoto;
+    console.log(imageData);
+    const result = bufferImage(imageData);
+    */
+   const imageData = feedInfo.fPhoto;
+   console.log(imageData);
+   
     res.json({
         "code": 201,
-        "feedInfo": feedInfo
+        "feedInfo": feedInfo,
+        //"img": imageData['data']
     });
 });
 
