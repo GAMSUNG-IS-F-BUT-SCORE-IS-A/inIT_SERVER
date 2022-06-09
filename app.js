@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const multer = require('multer');
 const fs = require('fs');
+const crypto = require('crypto');
 const dotenv = require('dotenv');
 
 //시퀄라이저
@@ -57,17 +58,35 @@ app.use(session({
 }));
 
 //이미지 저장 서버 디스크 생성
-const _storage = multer.diskStorage({
-    destination: 'uploads/',
-    filename: function(req, file, cb) {
-        return crypto.pseudoRandomBytes(16, function(err, raw) {
-            if(err) {
-                return cb(err);
-            }
-            return cb(null, file.originalname);
-        })
-    }
-})
+try {
+    fs.readdirSync('uploads');
+    console.log("이제 uploads 폴더에 이미지가 저장됩니다");
+} catch(err) {
+    console.log("uploads 폴더가 없어 uploads 폴더를 생성합니다");
+    fs.mkdirSync('uploads');
+}
+//이미지 저장 형식
+const upload = multer({
+    storage: multer.diskStorage({
+        destination(req, file, done) {
+            console.log("경로 설정 완");
+            done(null, 'uploads/');
+        },
+        filename(req, file, done) {
+            const ext = path.extname(file.originalname);
+            console.log("파일명 설정 완");
+            done(null, path.basename(file.originalname, ext) + Date.now() + ext);
+        }
+    })
+});
+//이미지 파일 비트맵으로 변환
+async function readImageFile(file){
+    fs.readFile(file, (err, data)=>{
+        if(err){throw err;}
+        const buf = new Buffer.from(data);
+        return buf;
+    });
+}
 
 
 //서버 실행
@@ -774,18 +793,13 @@ app.post('/updateLink', async function(req, res){
 });
 
 //프로필 수정
-app.post('/updateProfile', multer({storage: _storage}).single('file'), async function(req, res){
+app.post('/updateProfile', async function(req, res){
     var mNum = req.body.mNum;
     var mName = req.body.mName;
     var mPosition = req.body.mPosition;
     var mLevel = req.body.mLevel;
     var mIntroduction = req.body.mIntroduction;
-    //이미지 처리
-    function readImageFile(file) {
-        const bitmap = fs.readFileSync(file);
-        const buf = new Buffer.from(bitmap);
-        return buf;
-    }
+    
     //파일 이름 mNum.png로 받기
     try{
         const file = req.file;
@@ -888,19 +902,24 @@ app.post('/finishedProject', async function(req, res) {
 });
 
 //피드 작성
-app.post('/addFeed', async function(req, res){
+app.post('/addFeed', upload.single('fPhoto'), async function(req, res){
+    console.log("req.file: " + req.file);
     var fTitle = req.body.fTitle;
     var fType = req.body.fType;
-    var fPhoto = req.body.fPhoto;
     var fDescription = req.body.fDescription;
     var fLink = req.body.fLink;
     var mNum = req.body.mNum;
     var pNum = req.body.pNum;
+    
+
+    console.log('./uploads/'+req.file.filename);
+    //이미지 파일 db에 넣기
+    var imgData = readImageFile('./uploads/'+req.file.filename);
 
     Feed.create({
         fTitle: fTitle,
         fType: fType,
-        fPhoto: fPhoto,
+        fPhoto: imgData,
         fDescription: fDescription,
         fLink: fLink,
         mNum: mNum,
@@ -964,4 +983,99 @@ app.post('/detailFeed', async function(req, res){
         "code": 201,
         "feedInfo": feedInfo
     });
+});
+
+//팀원 정보 - 전체
+app.post('/teamMember', async function(req, res){
+    var pNum = req.body.pNum;
+
+    var approvedPlan = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 0,
+                rApproval: 1
+            }
+        }]
+    });
+    var approvedDesign = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 1,
+                rApproval: 1
+            }
+        }]
+    });
+    var approvedWeb = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 2,
+                rApproval: 1
+            }
+        }]
+    });
+    var approvedAos = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 3,
+                rApproval: 1
+            }
+        }]
+    });
+    var approvedIos = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 4,
+                rApproval: 1
+            }
+        }]
+    });
+    var approvedGame = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 5,
+                rApproval: 1
+            }
+        }]
+    });
+    var approvedServer = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 6,
+                rApproval: 1
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedPlan": approvedPlan,
+        "approvedDesign": approvedDesign,
+        "approvedWeb": approvedWeb,
+        "approvedAos": approvedAos,
+        "approvedIos": approvedIos,
+        "approvedGame": approvedGame,
+        "approvedServer": approvedServer
+    });
+
 });
