@@ -344,6 +344,30 @@ app.post('/addProject', function(req, res) {
 //프로젝트 상세보기
 app.post('/detailProject', async function(req, res){
     var pNum = req.body.pNum;
+    var mNum = req.body.mNum;
+
+    //현재 보고 있는 프로젝트에 승인된 사람인가요?
+    var approve = await Recruit.findOne({
+        attributes : ["rApproval"],
+        where: {
+            mNum: mNum,
+            pNum: pNum
+        }
+    });
+    var isApproval;
+    if(approve == null) {
+        isApproval = false;
+    }
+    else {
+        switch(approve[0].rApproval) {
+            case 0:
+                isApproval = false;
+                break;
+            case 1:
+                isApproval = true;
+                break;
+        }
+    }
 
     //프로젝트 정보
     var projectInfo = await ProjectInfo.findOne({
@@ -364,6 +388,7 @@ app.post('/detailProject', async function(req, res){
 
     res.json({
         "code": 201,
+        "isApproval": isApproval,
         "projectInfo": projectInfo,
         "writerInfo": writerInfo
     });
@@ -513,6 +538,7 @@ app.post('/home', async function(req, res) {
                     [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 1:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
@@ -520,6 +546,7 @@ app.post('/home', async function(req, res) {
                     [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 2:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
@@ -527,6 +554,7 @@ app.post('/home', async function(req, res) {
                     [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 3:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
@@ -534,6 +562,7 @@ app.post('/home', async function(req, res) {
                     [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 4:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
@@ -541,6 +570,7 @@ app.post('/home', async function(req, res) {
                     [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 5:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
@@ -548,6 +578,7 @@ app.post('/home', async function(req, res) {
                     [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 6:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
@@ -555,6 +586,7 @@ app.post('/home', async function(req, res) {
                     [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
     };
     if(projectInfoList2.length < 3) {
         list_recommend = projectInfoList2;
@@ -639,6 +671,7 @@ app.post('/getRecommenedProject', async function(req, res){
                     [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 1:
             pInfo = await ProjectInfo.findAll({
                 where: {
@@ -646,6 +679,7 @@ app.post('/getRecommenedProject', async function(req, res){
                     [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 2:
             pInfo = await ProjectInfo.findAll({
                 where: {
@@ -653,6 +687,7 @@ app.post('/getRecommenedProject', async function(req, res){
                     [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 3:
             pInfo = await ProjectInfo.findAll({
                 where: {
@@ -660,6 +695,7 @@ app.post('/getRecommenedProject', async function(req, res){
                     [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 4:
             pInfo = await ProjectInfo.findAll({
                 where: {
@@ -667,6 +703,7 @@ app.post('/getRecommenedProject', async function(req, res){
                     [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 5:
             pInfo = await ProjectInfo.findAll({
                 where: {
@@ -674,6 +711,7 @@ app.post('/getRecommenedProject', async function(req, res){
                     [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
         case 6:
             pInfo = await ProjectInfo.findAll({
                 where: {
@@ -681,6 +719,7 @@ app.post('/getRecommenedProject', async function(req, res){
                     [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}]
                 }
             });
+            break;
     };
     
     //작성자 정보
@@ -1064,5 +1103,4 @@ app.post('/teamMember', async function(req, res){
         "approvedGame": approvedGame,
         "approvedServer": approvedServer
     });
-
 });
