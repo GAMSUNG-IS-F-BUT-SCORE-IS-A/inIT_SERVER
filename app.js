@@ -364,6 +364,31 @@ app.post('/detailProject', async function(req, res){
     });
 });
 
+//모집중 프로젝트 전체보기
+app.get('/recrutingProject', async function(req, res){
+    //프로젝트 아이템 내용
+    const recruitingProject = await ProjectInfo.findAll({
+        where:{
+            pState: 0
+        }
+    });
+    //작성자
+    var writer = [];
+    for(var i=0; i<recruitingProject.length; i++) {
+        writer[i] = await Member.findOne({
+            attributes: ['mNum', 'mName'],
+            where:{mNum: recruitingProject[i].mNum}
+        });
+    }
+
+    res.json({
+        "code": 201,
+        "recruitingProject": recruitingProject,
+        "writer": writer
+    });
+
+});
+
 //프로젝트 공고 삭제
 app.post('/delProject', function(req, res) {
     var pNum = req.body.pNum;
