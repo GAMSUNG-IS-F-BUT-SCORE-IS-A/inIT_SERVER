@@ -832,7 +832,7 @@ app.post('/updateLink', async function(req, res){
 });
 
 //프로필 수정
-app.post('/updateProfile', upload.single('mPhoto'), async function(req, res){
+app.post('/updateProfile', upload.single('file'), async function(req, res){
     var mNum = req.body.mNum;
     var mName = req.body.mName;
     var mPosition = req.body.mPosition;
@@ -928,7 +928,7 @@ app.post('/finishedProject', async function(req, res) {
 });
 
 //피드 작성
-app.post('/addFeed', upload.single('fPhoto'), async function(req, res){
+app.post('/addFeed', upload.single('file'), async function(req, res){
     console.log("req.file: " + req.file);
     var fTitle = req.body.fTitle;
     var fType = req.body.fType;
