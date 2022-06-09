@@ -24,12 +24,17 @@ module.exports = class Todo extends Sequelize.Model {
                 type: Sequelize.DATE,
                 allowNull: false
             },
-            pNum: {
-                type: Sequelize.INTEGER,
-                allowNull: false
-            },
             mNums: {
                 type: Sequelize.STRING(50),
+                allowNull: false
+            },
+            tState: {
+                type: Sequelize.TINYINT,
+                allowNull: false,
+                defaultValue: 0
+            },
+            pNum: {
+                type: Sequelize.INTEGER,
                 allowNull: false
             }
         }, {
