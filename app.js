@@ -389,6 +389,30 @@ app.get('/recrutingProject', async function(req, res){
 
 });
 
+//모집 완료 프로젝트 전체보기
+app.get('/notRecruitingProject', async function(req, res){
+    //프로젝트 아이템 내용
+    const notRecruitingProject = await ProjectInfo.findAll({
+        where:{
+            [Op.or]: [{pState: 1}, {pState: 2}]
+        }
+    });
+    //작성자
+    var writer = [];
+    for(var i=0; i<notRecruitingProject.length; i++) {
+        writer[i] = await Member.findOne({
+            attributes: ['mNum', 'mName'],
+            where:{mNum: notRecruitingProject[i].mNum}
+        });
+    }
+
+    res.json({
+        "code": 201,
+        "notRecruitingProject": notRecruitingProject,
+        "writer": writer
+    });
+});
+
 //프로젝트 공고 삭제
 app.post('/delProject', function(req, res) {
     var pNum = req.body.pNum;
