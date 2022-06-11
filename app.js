@@ -92,7 +92,7 @@ async function readImageFile(file){
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '192.168.219.187', (err)=> {
+app.listen(3006, '172.30.1.25', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -1026,7 +1026,7 @@ app.post('/detailFeed', async function(req, res){
     });
 });
 
-//팀원 정보 - 전체
+//승인된 팀원 정보 - 전체
 app.post('/teamMember', async function(req, res){
     var pNum = req.body.pNum;
 
@@ -1052,7 +1052,7 @@ app.post('/teamMember', async function(req, res){
             }
         }]
     });
-    var approvedWeb = await Member.findAll({
+    var approvedIos = await Member.findAll({
         attributes: ['mNum', 'mName', 'mEmail'],
         include: [{
             model: Recruit,
@@ -1074,7 +1074,7 @@ app.post('/teamMember', async function(req, res){
             }
         }]
     });
-    var approvedIos = await Member.findAll({
+    var approvedWeb = await Member.findAll({
         attributes: ['mNum', 'mName', 'mEmail'],
         include: [{
             model: Recruit,
@@ -1085,6 +1085,7 @@ app.post('/teamMember', async function(req, res){
             }
         }]
     });
+      
     var approvedGame = await Member.findAll({
         attributes: ['mNum', 'mName', 'mEmail'],
         include: [{
@@ -1116,6 +1117,159 @@ app.post('/teamMember', async function(req, res){
         "approvedAos": approvedAos,
         "approvedIos": approvedIos,
         "approvedGame": approvedGame,
+        "approvedServer": approvedServer
+    });
+});
+
+//승인된 팀원 정보 - 기획
+app.post('/memberPlanner', async function(req, res){
+    var pNum = req.body.pNum;
+
+    var approvedPlan = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 0,
+                rApproval: 1
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedPlan": approvedPlan
+    });
+});
+
+//승인된 팀원 정보 - 디자인
+app.post('/memberDesigner', async function(req, res){
+    var pNum = req.body.pNum;
+
+    var approvedDesign = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 1,
+                rApproval: 1
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedDesign": approvedDesign
+    });
+});
+
+//승인된 팀원 정보 - ios
+app.post('/memberIos', async function(req, res){
+    var pNum = req.body.pNum;
+
+    var approvedIos = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 2,
+                rApproval: 1
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedIos": approvedIos
+    });
+});
+
+//승인된 팀원 정보 - aos
+app.post('/memberAos', async function(req, res){
+    var pNum = req.body.pNum;
+
+    var approvedAos = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 3,
+                rApproval: 1
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedAos": approvedAos
+    });
+});
+
+//승인된 팀원 정보 - 웹
+app.post('/memberWeb', async function(req, res){
+    var pNum = req.body.pNum;
+
+    var approvedDesign = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 4,
+                rApproval: 1
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedDesign": approvedDesign
+    });
+});
+//승인된 팀원 정보 - 게임
+app.post('/memberGame', async function(req, res){
+    var pNum = req.body.pNum;
+
+    var approvedGame = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 5,
+                rApproval: 1
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedGame": approvedGame
+    });
+});
+
+//승인된 팀원 정보 - 서버
+app.post('/memberServer', async function(req, res){
+    var pNum = req.body.pNum;
+
+    var approvedServer = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 6,
+                rApproval: 1
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
         "approvedServer": approvedServer
     });
 });
