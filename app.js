@@ -92,7 +92,7 @@ async function readImageFile(file){
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '172.30.1.25', (err)=> {
+app.listen(3006, '192.168.0.5', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -946,6 +946,7 @@ app.post('/addFeed', upload.single('file'), async function(req, res){
 
     //이미지 파일 db에 넣기
     var imgData = readImageFile('./uploads/'+req.file.filename);
+    var url = req.file.path
 
     Feed.create({
         fTitle: fTitle,
@@ -954,7 +955,8 @@ app.post('/addFeed', upload.single('file'), async function(req, res){
         fDescription: fDescription,
         fLink: fLink,
         mNum: mNum,
-        pNum: pNum
+        pNum: pNum,
+        fTest: url
     })
     .then(()=>{
         var message = "피드 등록이 완료되었습니다";
@@ -988,7 +990,7 @@ app.post('/deleteFeed', async function(req, res) {
 //피드 전체 보기
 app.get('/getAllFeed', async function(req, res){
     var feeds = await Feed.findAll({
-        attributes: ['fNum', 'fTitle', 'fPhoto']
+        attributes: ['fNum', 'fTitle', 'fPhoto', 'fTest']
     });
 
     res.json({
