@@ -299,6 +299,7 @@ app.post('/addProject', async function(req, res) {
     var pWebf = req.body.pWebf;
     var pServerf = req.body.pServerf;
     var mNum = req.body.mNum;
+    var mPosition = req.body.mPosition;
     var pStack = req.body.pStack;
     
     var create_projectInfo = await ProjectInfo.create({
@@ -331,8 +332,16 @@ app.post('/addProject', async function(req, res) {
         pStack: pStack,
     });
 
+    var create_recruit = await Recruit.create({
+        mNum: mNum,
+        pNum: create_projectInfo.pNum,
+        rApproval: 1,
+        rPosition: mPosition
+    });
+
     res.json({
-        "create_projectInfo": create_projectInfo
+        "code": 201,
+        "message": "공고등록이 완료되었습니다."
     });
 
 });
@@ -1028,7 +1037,7 @@ app.post('/teamMember', async function(req, res){
     var pNum = req.body.pNum;
 
     var approvedPlan = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1039,7 +1048,7 @@ app.post('/teamMember', async function(req, res){
         }]
     });
     var approvedDesign = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1050,7 +1059,7 @@ app.post('/teamMember', async function(req, res){
         }]
     });
     var approvedIos = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1061,7 +1070,7 @@ app.post('/teamMember', async function(req, res){
         }]
     });
     var approvedAos = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1072,7 +1081,7 @@ app.post('/teamMember', async function(req, res){
         }]
     });
     var approvedWeb = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1084,7 +1093,7 @@ app.post('/teamMember', async function(req, res){
     });
       
     var approvedGame = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1095,7 +1104,7 @@ app.post('/teamMember', async function(req, res){
         }]
     });
     var approvedServer = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1123,7 +1132,7 @@ app.post('/memberPlanner', async function(req, res){
     var pNum = req.body.pNum;
 
     var approvedPlan = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1145,7 +1154,7 @@ app.post('/memberDesigner', async function(req, res){
     var pNum = req.body.pNum;
 
     var approvedDesign = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1167,7 +1176,7 @@ app.post('/memberIos', async function(req, res){
     var pNum = req.body.pNum;
 
     var approvedIos = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1189,7 +1198,7 @@ app.post('/memberAos', async function(req, res){
     var pNum = req.body.pNum;
 
     var approvedAos = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1211,7 +1220,7 @@ app.post('/memberWeb', async function(req, res){
     var pNum = req.body.pNum;
 
     var approvedDesign = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1232,7 +1241,7 @@ app.post('/memberGame', async function(req, res){
     var pNum = req.body.pNum;
 
     var approvedGame = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
@@ -1254,7 +1263,7 @@ app.post('/memberServer', async function(req, res){
     var pNum = req.body.pNum;
 
     var approvedServer = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mEmail'],
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
             model: Recruit,
             where: {
