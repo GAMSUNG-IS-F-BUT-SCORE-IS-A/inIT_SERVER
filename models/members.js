@@ -59,7 +59,7 @@ module.exports = class Member extends Sequelize.Model {
                 type: Sequelize.STRING(200)
             },
             mPhoto: {
-                type: Sequelize.BLOB
+                type: Sequelize.TEXT
             },
             mApproval: {
                 type: Sequelize.INTEGER,

@@ -92,7 +92,7 @@ async function readImageFile(file){
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '192.168.0.5', (err)=> {
+app.listen(3006, '172.30.1.6', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -1005,6 +1005,7 @@ app.post('/detailFeed', async function(req, res){
 
     //피드 정보
     var feedInfo = await Feed.findOne({
+        attributes: ['fNum', 'fTitle', 'fType', 'fPhoto', 'fDescription', 'fLink', 'mNum', 'pNum', 'fTest', 'fTimeStamp'],
         include: [{
             attributes: ['mNum', 'mName', 'mPhoto'],
             model: Member
@@ -1273,5 +1274,62 @@ app.post('/memberServer', async function(req, res){
     res.json({
         "code": 201,
         "approvedServer": approvedServer
+    });
+});
+
+//마이페이지 - 찜한 프로젝트 조회
+app.post('/myZzimList', async function(req, res){
+    var mNum = req.body.mNum;
+
+    var projectInfoList = await ProjectInfo.findAll({
+        include: [{
+            model: Zzim,
+            where: {mNum: mNum}
+        }]
+    });
+    //작성자
+    var writer = [];
+    for(var i=0; i<projectInfoList.length; i++) {
+        writer[i] = await Member.findOne({
+            attributes: ['mNum', 'mName'],
+            where:{mNum: projectInfoList[i].mNum}
+        });
+    }
+    res.json({
+        "code": 201,
+        "projectInfoList": projectInfoList,
+        "writer": writer
+    });
+});
+
+//승인 대기중인 공고
+app.post('/myWaitingApproval', async function(req, res){
+    var mNum = req.body.mNum;
+
+    var projectInfoList = await ProjectInfo.findAll({
+        include: [{
+            model: Recruit,
+            where: {
+                mNum: mNum,
+                rApproval: 0
+            }
+        }],
+        where: {
+            pState: 0
+        }
+    });
+    //작성자
+    var writer = [];
+    for(var i=0; i<projectInfoList.length; i++) {
+        writer[i] = await Member.findOne({
+            attributes: ['mNum', 'mName'],
+            where:{mNum: projectInfoList[i].mNum}
+        });
+    }
+
+    res.json({
+        "code": 201,
+        "projectInfoList": projectInfoList,
+        "writer": writer
     });
 });
