@@ -1434,3 +1434,34 @@ app.post('/myUploadProject', async function(req,res){
         "projectInfoList": projectInfoList
     });
 });
+
+//내가 속한 프로젝트의 피드
+app.post('/myFeeds', async function(req,res){
+    var mNum = req.body.mNum;
+
+    var pNums = await ProjectInfo.findAll({
+        attributes: ['pNum'],
+        include: [{
+            model: Recruit,
+            where: {
+                mNum: mNum,
+                rApproval: 1
+            }
+        }],
+        where: {pState: 2}
+    });
+
+    var feeds = [];
+    for(var i = 0; i<pNums.length;i++){
+        var feed_project = await Feed.findOne({
+            attributes: ['fNum', 'fTitle', 'fTest'],
+            where: {pNum: pNums[i].pNum}
+        });
+        feeds[i] = feed_project;
+    }
+
+    res.json({
+        "code": 201,
+        "Feeds": feeds
+    });
+});
