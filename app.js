@@ -271,8 +271,8 @@ app.post('/withdraw', function(req, res) {
 })
 
 
-//프로젝트 정보 업로드
-app.post('/addProject', function(req, res) {
+//프로젝트 글쓰기
+app.post('/addProject', async function(req, res) {
     console.log(req);
     var pTitle = req.body.pTitle;
     var pType = req.body.pType;
@@ -301,7 +301,7 @@ app.post('/addProject', function(req, res) {
     var mNum = req.body.mNum;
     var pStack = req.body.pStack;
     
-    ProjectInfo.create({
+    var create_projectInfo = await ProjectInfo.create({
         pTitle: pTitle,
         pType: pType,
         pRecruitStart: pRecruitStart,
@@ -329,17 +329,12 @@ app.post('/addProject', function(req, res) {
         pStatus: 0,
         mNum: mNum,
         pStack: pStack,
-    })
-    .then(()=>{
-        var message = "프로젝트 모집 공고가 등록되었습니다."
-        res.json({
-            "code": 201,
-            "message": message,
-        })
-    })
-    .catch((err)=>{
-        console.log(err);
-    })
+    });
+
+    res.json({
+        "create_projectInfo": create_projectInfo
+    });
+
 });
 
 //프로젝트 상세보기
@@ -1005,7 +1000,6 @@ app.post('/detailFeed', async function(req, res){
 
     //피드 정보
     var feedInfo = await Feed.findOne({
-        attributes: ['fNum', 'fTitle', 'fType', 'fPhoto', 'fDescription', 'fLink', 'mNum', 'pNum', 'fTest', 'fTimeStamp'],
         include: [{
             attributes: ['mNum', 'mName', 'mPhoto'],
             model: Member

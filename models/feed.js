@@ -36,6 +36,9 @@ module.exports = class Feed extends Sequelize.Model {
             },
             fTest: {
                 type: Sequelize.STRING(200)
+            },
+            fTimeStamp: {
+                type: Sequelize.DATE
             }
         }, {
             sequelize,
