@@ -841,6 +841,30 @@ app.post('/updateLink', async function(req, res){
     });
 });
 
+//스택 수정
+app.post('/updateStack', async function(req,res){
+    var mNum = req.body.mNum;
+    var mStacks = req.body.mStacks;
+    console.log(req);
+    Member.update({
+        mStacks: mStacks
+    }, {
+        where: {mNum: mNum}
+    })
+    .then(()=>{
+        var message = "스택 수정이 완료되었습니다";
+        var result = true;
+        res.json({
+            "code": 201,
+            "result": result,
+            "message": message
+        });
+    })
+    .catch((err)=>{
+        console.log(err);
+    });
+});
+
 //프로필 수정
 app.post('/updateProfile', upload.single('file'), async function(req, res){
     var mNum = req.body.mNum;
