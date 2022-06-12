@@ -33,6 +33,9 @@ module.exports = class Feed extends Sequelize.Model {
             pNum: {
                 type: Sequelize.INTEGER,
                 allowNull: false
+            },
+            fTest: {
+                type: Sequelize.STRING(200)
             }
         }, {
             sequelize,
