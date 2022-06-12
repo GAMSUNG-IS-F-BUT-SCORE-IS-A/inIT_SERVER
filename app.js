@@ -1396,3 +1396,17 @@ app.post('/myEndProject', async function(req,res){
         "writer": writer
     });
 });
+
+//업로드한 프로젝트
+app.post('/myUploadProject', async function(req,res){
+    var mNum = req.body.mNum;
+
+    var projectInfoList = await ProjectInfo.findAll({
+        where:{mNum: mNum}
+    });
+
+    res.json({
+        "code": 201,
+        "projectInfoList": projectInfoList
+    });
+});
