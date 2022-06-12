@@ -1336,3 +1336,34 @@ app.post('/myWaitingApproval', async function(req, res){
         "writer": writer
     });
 });
+
+//참여 중인 프로젝트
+app.post('/myIngProject', async function(req,res){
+    var mNum = req.body.mNum;
+
+    var projectInfoList = await ProjectInfo.findAll({
+        include:[{
+            model: Recruit,
+            where:{
+                mNum: mNum,
+                rApproval: 1
+            }
+        }],
+        where: {pState: 1}
+    });
+
+    //작성자
+    var writer = [];
+    for(var i=0; i<projectInfoList.length; i++) {
+        writer[i] = await Member.findOne({
+            attributes: ['mNum', 'mName'],
+            where:{mNum: projectInfoList[i].mNum}
+        });
+    }
+
+    res.json({
+        "code": 201,
+        "projectInfoList": projectInfoList,
+        "writer": writer
+    });
+});
