@@ -98,7 +98,6 @@ app.listen(3006, '172.30.1.6', (err)=> {
     }
 })
 
-//원격 저장 못함;
 
 //앱 로그인
 app.post('/login', function(req, res) {
