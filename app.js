@@ -92,7 +92,7 @@ async function readImageFile(file){
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '172.30.1.6', (err)=> {
+app.listen(3006, '192.168.0.5', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -351,6 +351,7 @@ app.post('/addProject', async function(req, res) {
 app.post('/detailProject', async function(req, res){
     var pNum = req.body.pNum;
     var mNum = req.body.mNum;
+    console.log("요청: " + mNum);
 
     //현재 보고 있는 프로젝트에 승인된 사람인가요?
     var approve = await Recruit.findOne({
@@ -473,15 +474,16 @@ app.post('/apply', async function(req, res) {
     var mNum = req.body.mNum;
     var pNum = req.body.pNum;
     var rPosition = req.body.rPosition;
+    console.log(req);
 
     var alreadyApply = await Recruit.findAll({
         where: {
             mNum: mNum,
-            pNum: pNum,
-            rPosition : rPosition
+            pNum: pNum
         }
     });
     if(alreadyApply == null) {
+        console.log("지원 성공");
         Recruit.create({
             mNum: mNum,
             pNum: pNum,
@@ -501,6 +503,7 @@ app.post('/apply', async function(req, res) {
     }
     else{
         var message = "이미 지원한 프로젝트입니다";
+        console.log(message)
         res.json({
             "code": 202,
             "message": message
@@ -553,7 +556,8 @@ app.post('/home', async function(req, res) {
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
                     pPlan: { [Op.gte]: 1},
-                    [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -561,7 +565,8 @@ app.post('/home', async function(req, res) {
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
                     pDesign: { [Op.gte]: 1},
-                    [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -569,7 +574,8 @@ app.post('/home', async function(req, res) {
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
                     pIos: { [Op.gte]: 1},
-                    [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -577,7 +583,8 @@ app.post('/home', async function(req, res) {
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
                     pAos: { [Op.gte]: 1},
-                    [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -585,7 +592,8 @@ app.post('/home', async function(req, res) {
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
                     pGame: { [Op.gte]: 1},
-                    [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -593,7 +601,8 @@ app.post('/home', async function(req, res) {
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
                     pWeb: { [Op.gte]: 1},
-                    [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -601,7 +610,8 @@ app.post('/home', async function(req, res) {
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
                     pServer: { [Op.gte]: 1},
-                    [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -686,7 +696,8 @@ app.post('/getRecommenedProject', async function(req, res){
             pInfo = await ProjectInfo.findAll({
                 where: {
                     pPlan: { [Op.gte]: 1},
-                    [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -694,7 +705,8 @@ app.post('/getRecommenedProject', async function(req, res){
             pInfo = await ProjectInfo.findAll({
                 where: {
                     pDesign: { [Op.gte]: 1},
-                    [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -702,7 +714,8 @@ app.post('/getRecommenedProject', async function(req, res){
             pInfo = await ProjectInfo.findAll({
                 where: {
                     pIos: { [Op.gte]: 1},
-                    [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -710,7 +723,8 @@ app.post('/getRecommenedProject', async function(req, res){
             pInfo = await ProjectInfo.findAll({
                 where: {
                     pAos: { [Op.gte]: 1},
-                    [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -718,7 +732,8 @@ app.post('/getRecommenedProject', async function(req, res){
             pInfo = await ProjectInfo.findAll({
                 where: {
                     pGame: { [Op.gte]: 1},
-                    [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -726,7 +741,8 @@ app.post('/getRecommenedProject', async function(req, res){
             pInfo = await ProjectInfo.findAll({
                 where: {
                     pWeb: { [Op.gte]: 1},
-                    [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
@@ -734,7 +750,8 @@ app.post('/getRecommenedProject', async function(req, res){
             pInfo = await ProjectInfo.findAll({
                 where: {
                     pServer: { [Op.gte]: 1},
-                    [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}]
+                    [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}],
+                    pState: 0
                 }
             });
             break;
