@@ -88,7 +88,7 @@ module.exports = class Member extends Sequelize.Model {
         db.Member.hasMany(db.Zzim, {foreignKey: 'mNum', sourceKey: 'mNum'});
         db.Member.hasMany(db.Recruit, {foreignKey: 'mNum', sourceKey: 'mNum'});
         db.Member.hasMany(db.Feed, {foreignKey: 'mNum', sourceKey: 'mNum'});
-        db.Member.belongsToMany(db.Todo, {through: 'TodoManager'})
+        //db.Member.belongsToMany(db.Todo, {through: 'TodoManager'})
         db.Member.hasMany(db.Evaluation, {foreignKey: 'mNum', sourceKey: 'mNum'});
         db.Member.hasMany(db.Evaluation, {foreignKey: 'ePerson', sourceKey: 'mNum'});
     }
