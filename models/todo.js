@@ -8,17 +8,12 @@ module.exports = class Todo extends Sequelize.Model {
                 primaryKey: true,
                 autoIncrement: true
             },
-            tPart: {
-                type: Sequelize.INTEGER,
-                allowNull: false
-            },
             tTodo: {
                 type: Sequelize.STRING(100),
                 allowNull: false
             },
             tWritedate: {
-                type: Sequelize.DATE,
-                allowNull: false
+                type: Sequelize.DATE
             },
             tDday: {
                 type: Sequelize.DATE,
