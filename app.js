@@ -1019,6 +1019,37 @@ app.post('/countProject', async function(req, res) {
     });
 });
 
+//마이페이지: 내 평가 보기
+app.post('/myEvaluation', async function(req,res){
+    var mNum = req.body.mNum;
+
+    var myEvaluations = await Evaluation.findAll({
+        attributes: ['eNum', 'eComment', 'mNum'],
+        where: {ePerson: mNum},
+        include: [{
+            attributes: ['pNum', 'pTitle'],
+            model: ProjectInfo
+        }]
+    });
+
+    var evaluationList = [];
+    for(var i=0; i<myEvaluations.length; i++) {
+        var writer = await Member.findOne({
+            attributes: ['mNum', 'mName', 'mPhoto'],
+            where: {mNum: myEvaluations[i].mNum}
+        })
+        evaluationList[i] = {
+            evaluation: myEvaluations[i],
+            writer: writer
+        }
+    }
+
+    res.json({
+        "code": 201,
+        "myEvaluation": evaluationList
+    });
+});
+
 //피드 작성용 바텀시트
 app.post('/finishedProject', async function(req, res) {
     var mNum = req.body.mNum;
