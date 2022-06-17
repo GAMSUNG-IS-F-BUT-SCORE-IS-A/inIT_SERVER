@@ -1617,3 +1617,35 @@ app.post('/updateTodo', async function(req,res){
         });
     });
 });
+
+//투두 상태 업데이트
+app.post('/updateTodoState', async function(req,res){
+    var tNum = req.body.tNum;
+    
+    var nowState = await Todo.findOne({
+        attributes: ['tState'],
+        where: {tNum: tNum}
+    });
+
+    console.log(nowState.tState);
+
+    var updateState;
+    if(nowState.tState == 0) {
+        updateState = await Todo.update({
+            tState: 1,
+        }, {
+            where: {tNum: tNum}
+        });
+    }
+    else if(nowState.tState == 1){
+        updateState = await Todo.update({
+            tState: 0,
+        }, {
+            where: {tNum: tNum}
+        });
+    }
+
+    res.json({
+        "code": 201
+    });
+});
