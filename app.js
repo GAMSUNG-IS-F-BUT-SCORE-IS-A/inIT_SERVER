@@ -1809,3 +1809,24 @@ app.post('/addEvaluate', async function(req, res){
         });
     }
 });
+
+//내가 입력한 평가 보기
+app.post('/checkEvaluation', async function(req,res){
+    var mNum = req.body.mNum; //로그인한 사용자
+    var ePerson = req.body.ePerson; //평가 대상자
+    var pNum = req.body.pNum;
+
+    var myEvaluation = await Evaluation.findOne({
+        attributes: ['eNum', 'eRecommend', 'eComment'],
+        where: {
+            mNum: mNum,
+            pNum: pNum,
+            ePerson: ePerson
+        }
+    });
+
+    res.json({
+        "code": 201,
+        "evaluation": myEvaluation
+    });
+});
