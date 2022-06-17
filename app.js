@@ -20,6 +20,7 @@ const ProjectInfo = require('./models/projectinfo');
 const Recruit = require("./models/recruit");
 const Feed = require('./models/feed');
 const Zzim = require('./models/zzim');
+const Todo = require('./models/todo');
 //const { where } = require('sequelize/types');
 //const { Model } = require('sequelize/types');
 
@@ -1563,5 +1564,31 @@ app.post('/todoMember', async function(req,res){
     res.json({
         "code": 201,
         "members": members
+    });
+});
+
+//투두 작성
+app.post('/addTodo', async function(req,res){
+    var tTodo = req.body.tTodo;
+    var tDday = req.body.tDday;
+    var mNums = req.body.mNums;
+    var pNum = req.body.pNum;
+
+    Todo.create({
+        tTodo: tTodo,
+        tDday: tDday,
+        mNums: mNums,
+        tState: 0,
+        pNum: pNum
+    })
+    .then(()=>{
+        var message = "투두가 등록되었습니다.";
+        res.json({
+            "code": 201,
+            "message": message
+        });
+    })
+    .catch((err)=>{
+        console.log(err);
     });
 });
