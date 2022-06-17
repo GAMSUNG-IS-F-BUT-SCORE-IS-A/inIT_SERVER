@@ -21,6 +21,7 @@ const Recruit = require("./models/recruit");
 const Feed = require('./models/feed');
 const Zzim = require('./models/zzim');
 const Todo = require('./models/todo');
+const Evaluation = require('./models/evaluation');
 //const { where } = require('sequelize/types');
 //const { Model } = require('sequelize/types');
 
@@ -93,7 +94,7 @@ async function readImageFile(file){
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '192.168.100.3', (err)=> {
+app.listen(3006, '192.168.100.17', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -1699,5 +1700,69 @@ app.post('/allTodo', async function(req,res){
     res.json({
         "code": 201,
         "todoList": todoList
+    });
+});
+
+//평가를 입력하지 않은 팀원 불러오기
+app.post('/notEveluate', async function(req,res){
+    var pNum = req.body.pNum; //프로젝트
+    var mNum = req.body.mNum; //평가자
+
+    var members = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mPosition', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rApproval: 1
+            }
+        }]
+    });
+
+    var alreadyEvaluate = await Evaluation.findAll({
+        attributes: ['ePerson'],
+        where: {mNum: mNum}
+    });
+
+    for(var i=0; i<alreadyEvaluate.length; i++){
+        var key = alreadyEvaluate[i].ePerson;
+        for(var j=0; j<members.length; j++) {
+            if(members[j].mNum == key || members[j].mNum == mNum) {
+                members.splice(j, 1);
+                j--;
+            }
+        }
+    }
+
+    res.json({
+        "code": 201,
+        "memberToEvaluate": members
+    });
+});
+
+//이미 평가한 팀원 불러오기
+app.post('/alreadyEvaluate', async function(req,res){
+    var pNum = req.body.pNum; //프로젝트
+    var mNum = req.body.mNum; //평가자
+
+    var evaluated = await Evaluation.findAll({
+        attributes: ['ePerson'],
+        where: {
+            pNum: pNum,
+            mNum: mNum
+        }
+    });
+
+    var members = [];
+    for(var i=0; i<evaluated.length; i++) {
+        members[i] = await Member.findOne({
+            attributes: ['mNum', 'mName', 'mPhoto', 'mPosition'],
+            where: {mNum: evaluated[i].ePerson}
+        });
+    }
+
+    res.json({
+        "code": 201,
+        "members": members
     });
 });
