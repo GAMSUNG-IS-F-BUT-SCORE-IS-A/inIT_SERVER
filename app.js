@@ -1649,3 +1649,20 @@ app.post('/updateTodoState', async function(req,res){
         "code": 201
     });
 });
+
+//투두 삭제
+app.post('/deleteTodo', async function(req,res){
+    var tNum = req.body.tNum;
+
+    Todo.destroy({where: {tNum: tNum}})
+    .then((result)=>{
+        var message = "투두가 삭제되었습니다.";
+        res.json({
+            "code": 201,
+            "message": message
+        });
+    })
+    .catch((err)=>{
+        console.log(err);
+    });
+});
