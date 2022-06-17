@@ -92,7 +92,7 @@ async function readImageFile(file){
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '172.30.1.25', (err)=> {
+app.listen(3006, '192.168.100.17', (err)=> {
     if(!err) {
         console.log('server start');
     }
@@ -449,6 +449,19 @@ app.get('/notRecruitingProject', async function(req, res){
         "code": 201,
         "notRecruitingProject": notRecruitingProject,
         "writer": writer
+    });
+});
+
+//파트원 전체 보기
+app.get('/userAll', async function(req,res){
+    const userInfo = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mPosition', 'mIntroduction', 'mPhoto'],
+        limit: 30
+    });
+
+    res.json({
+        "code": 201,
+        "userList": userInfo
     });
 });
 
