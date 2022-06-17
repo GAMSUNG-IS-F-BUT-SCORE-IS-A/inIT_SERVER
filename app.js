@@ -1592,3 +1592,28 @@ app.post('/addTodo', async function(req,res){
         console.log(err);
     });
 });
+
+//투두 수정
+app.post('/updateTodo', async function(req,res){
+    var tNum = req.body.tNum;
+    var tTodo = req.body.tTodo;
+    var tDday = req.body.tDday;
+    var mNums = req.body.mNums;
+    var pNum = req.body.pNum;
+
+    Todo.update({
+        tTodo: tTodo,
+        tDday: tDday,
+        mNums: mNums,
+        pNum: pNum
+    },{
+        where: {tNum: tNum}
+    })
+    .then(()=>{
+        var message = "투두가 수정되었습니다.";
+        res.json({
+            "code": 201,
+            "message": message
+        });
+    });
+});
