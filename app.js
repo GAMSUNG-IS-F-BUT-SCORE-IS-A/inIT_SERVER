@@ -1551,7 +1551,7 @@ app.post('/todoMember', async function(req,res){
     var pNum = req.body.pNum;
 
     var members = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mPhoto'],
+        attributes: ['mNum', 'mName', 'mPhoto', 'mPosition'],
         include: [{
             model: Recruit,
             where: {
@@ -1664,5 +1664,39 @@ app.post('/deleteTodo', async function(req,res){
     })
     .catch((err)=>{
         console.log(err);
+    });
+});
+
+//투두 전체 보기
+app.post('/allTodo', async function(req,res){
+    var pNum = req.body.pNum;
+
+    var todoInfo = await Todo.findAll({
+        where: {pNum: pNum}
+    });
+
+    var todoList = [];
+
+    //담당자
+    for(var i=0; i<todoInfo.length; i++) {
+        var mNums = todoInfo[i].mNums.split(',');
+        console.log('담당자 리스트: '+ mNums);
+        var memberInfo=[];
+        for(var j=0; j<mNums.length; j++) {
+            console.log('담당자 정보: '+ mNums[j]);
+            memberInfo[j] = await Member.findOne({
+                attributes: ['mNum', 'mPhoto'],
+                where: {mNum: mNums[j]}
+            });
+        }
+        todoList[i] = {
+            todoInfo: todoInfo[i],
+            members: memberInfo
+        };
+    }
+
+    res.json({
+        "code": 201,
+        "todoList": todoList
     });
 });
