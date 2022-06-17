@@ -1766,3 +1766,46 @@ app.post('/alreadyEvaluate', async function(req,res){
         "members": members
     });
 });
+
+//평가 입력하기
+app.post('/addEvaluate', async function(req, res){
+    var mNum = req.body.mNum;//평가자
+    var pNum = req.body.pNum;
+    var ePerson = req.body.ePerson; //평가 대상
+    var eRecommend = req.body.eRecommend;//추천 체크 여부
+    var eComment = req.body.eComment;
+
+    var is_evaluate = await Evaluation.findAll({
+        where: {
+            mNum: mNum,
+            pNum: pNum,
+            ePerson: ePerson
+        }
+    });
+    if(is_evaluate.length != 0) {
+        var message = "이미 평가를 입력한 팀원입니다."
+        res.json({
+            "code": 201,
+            "message": message
+        });
+    }
+    else{
+        Evaluation.create({
+            mNum: mNum,
+            pNum: pNum,
+            ePerson: ePerson,
+            eRecommend: eRecommend,
+            eComment: eComment
+        })
+        .then(()=>{
+            var message = "평가가 입력되었습니다.";
+            res.json({
+                "code": 202,
+                "message": message
+            });
+        })
+        .catch((err)=>{
+            console.log(err);
+        });
+    }
+});
