@@ -839,6 +839,7 @@ app.post('/getRecommenedProject', async function(req, res){
 //마이페이지 내 정보 불러오기
 app.post('/myPage', async function(req, res){
     var mNum = req.body.mNum;
+    console.log("로그인된 사용자: " + mNum);
 
     var mInfo = await Member.findOne({
         where:{
