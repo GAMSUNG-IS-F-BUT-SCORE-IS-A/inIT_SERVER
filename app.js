@@ -34,19 +34,19 @@ const app = express();
 
 
 //데이터베이스 연결
-sequelize.sync({force: false})
-.then(()=>{
-    console.log('데이터베이스 연결');
-})
-.catch((err)=>{
-    console.error(err);
-})
+sequelize.sync({ force: false })
+    .then(() => {
+        console.log('데이터베이스 연결');
+    })
+    .catch((err) => {
+        console.error(err);
+    })
 
 //미들웨어 등록
 app.use(morgan('dev'));
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(session({
@@ -64,7 +64,7 @@ app.use(session({
 try {
     fs.readdirSync('uploads');
     console.log("이제 uploads 폴더에 이미지가 저장됩니다");
-} catch(err) {
+} catch (err) {
     console.log("uploads 폴더가 없어 uploads 폴더를 생성합니다");
     fs.mkdirSync('uploads');
 }
@@ -83,9 +83,9 @@ const upload = multer({
     })
 });
 //이미지 파일 비트맵으로 변환
-async function readImageFile(file){
-    fs.readFile(file, (err, data)=>{
-        if(err){throw err;}
+async function readImageFile(file) {
+    fs.readFile(file, (err, data) => {
+        if (err) { throw err; }
         const buf = new Buffer.from(data);
         return buf;
     });
@@ -95,15 +95,15 @@ async function readImageFile(file){
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '192.168.100.17', (err)=> {
-    if(!err) {
+app.listen(3006, '192.168.100.17', (err) => {
+    if (!err) {
         console.log('server start');
     }
 })
 
 
 //앱 로그인
-app.post('/login', function(req, res) {
+app.post('/login', function (req, res) {
     console.log(req);
     var mID = req.body.mID;
     var mPW = req.body.mPW;
@@ -114,62 +114,62 @@ app.post('/login', function(req, res) {
             mID: mID
         },
     })
-    .then((members) => {
-        if(members.length == 0) {
-            members = null;
-            message = "존재하지 않는 아이디입니다.";
-            res.json({
-                'code': 201,
-                'member': members,
-                'message': message,
-            })
-        }
-        else if(members[0].mPW != mPW) {
-            members = null;
-            message = "비밀번호가 틀렸습니다.";
-            res.json({
-                'code': 202,
-                'member': members,
-                'message': message,
-            })
-        }
-        else if(members[0].mPW == mPW) {
-            if(members[0].mApproval == 0) {
+        .then((members) => {
+            if (members.length == 0) {
                 members = null;
-                message = "승인 대기 중입니다.";
+                message = "존재하지 않는 아이디입니다.";
                 res.json({
-                    'code': 203,
+                    'code': 201,
                     'member': members,
                     'message': message,
                 })
             }
-            /*
-            else if(members[0].mApproval == 2) {
+            else if (members[0].mPW != mPW) {
                 members = null;
-                message = "탈퇴한 계정입니다.";
+                message = "비밀번호가 틀렸습니다.";
                 res.json({
-                    'code': 204,
-                    'member': members,
-                    'message': message,
-                })
-            }*/
-            else if(members[0].mApproval == 1) {
-                message = members[0].mName + "님 환영합니다.";
-                res.json({
-                    'code': 204,
+                    'code': 202,
                     'member': members,
                     'message': message,
                 })
             }
-        }
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
+            else if (members[0].mPW == mPW) {
+                if (members[0].mApproval == 0) {
+                    members = null;
+                    message = "승인 대기 중입니다.";
+                    res.json({
+                        'code': 203,
+                        'member': members,
+                        'message': message,
+                    })
+                }
+                /*
+                else if(members[0].mApproval == 2) {
+                    members = null;
+                    message = "탈퇴한 계정입니다.";
+                    res.json({
+                        'code': 204,
+                        'member': members,
+                        'message': message,
+                    })
+                }*/
+                else if (members[0].mApproval == 1) {
+                    message = members[0].mName + "님 환영합니다.";
+                    res.json({
+                        'code': 204,
+                        'member': members,
+                        'message': message,
+                    })
+                }
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 //회원가입
-app.post('/signUp', function(req, res) {
+app.post('/signUp', function (req, res) {
     console.log(res);
     var mID = req.body.mID;
     var mPW = req.body.mPW;
@@ -194,21 +194,21 @@ app.post('/signUp', function(req, res) {
         mLevel: mLevel,
         mApproval: 0,
     })
-    .then(() => {
-        var code = 201;
-        message = "회원가입이 완료되었습니다.";
-        res.json({
-            "code": code,
-            "message": message,
+        .then(() => {
+            var code = 201;
+            message = "회원가입이 완료되었습니다.";
+            res.json({
+                "code": code,
+                "message": message,
+            })
         })
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 //아이디 중복 확인
-app.post('/idCheck', function(req, res) {
+app.post('/idCheck', function (req, res) {
     var id = req.body.mID;
     var is_check = false;
     var message = "";
@@ -218,37 +218,37 @@ app.post('/idCheck', function(req, res) {
             mID: id,
         },
     })
-    .then((result)=>{
-        if(result.length == 0) {//결과 없음
-            message = "사용 가능한 아이디입니다.";
-            is_check = true;
-            res.json({
-                "code": 201,
-                "is_check": is_check,
-                "message": message
-            })
-        }
-        else {
-            message = "이미 사용 중인 아이디입니다."
-            res.json({
-                "code": 202,
-                "is_check": is_check,
-                "message": message,
-            })
-        }
-    })
-    .catch((err)=> {
-        console.log(err);
-    });
+        .then((result) => {
+            if (result.length == 0) {//결과 없음
+                message = "사용 가능한 아이디입니다.";
+                is_check = true;
+                res.json({
+                    "code": 201,
+                    "is_check": is_check,
+                    "message": message
+                })
+            }
+            else {
+                message = "이미 사용 중인 아이디입니다."
+                res.json({
+                    "code": 202,
+                    "is_check": is_check,
+                    "message": message,
+                })
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 //회원 탈퇴
-app.post('/withdraw', function(req, res) {
+app.post('/withdraw', function (req, res) {
     var mNum = req.body.mNum;
     var is_checked = req.body.is_checked;
     var message = "";
 
-    if(is_checked == false) {
+    if (is_checked == false) {
         message = "탈퇴 확인을 완료해주세요";
         res.json({
             "code": 201,
@@ -261,22 +261,22 @@ app.post('/withdraw', function(req, res) {
                 mNum: mNum
             }
         })
-        .then((result)=>{
-            message = "탈퇴가 완료되었습니다.";
-            res.json({
-                "code": 202,
-                "message": message
+            .then((result) => {
+                message = "탈퇴가 완료되었습니다.";
+                res.json({
+                    "code": 202,
+                    "message": message
+                })
             })
-        })
-        .catch((err)=>{
-            console.log(err);
-        })
+            .catch((err) => {
+                console.log(err);
+            })
     }
 })
 
 
 //프로젝트 글쓰기
-app.post('/addProject', async function(req, res) {
+app.post('/addProject', async function (req, res) {
     console.log(req);
     var pTitle = req.body.pTitle;
     var pType = req.body.pType;
@@ -305,7 +305,7 @@ app.post('/addProject', async function(req, res) {
     var mNum = req.body.mNum;
     var mPosition = req.body.mPosition;
     var pStack = req.body.pStack;
-    
+
     var create_projectInfo = await ProjectInfo.create({
         pTitle: pTitle,
         pType: pType,
@@ -351,25 +351,25 @@ app.post('/addProject', async function(req, res) {
 });
 
 //프로젝트 상세보기
-app.post('/detailProject', async function(req, res){
+app.post('/detailProject', async function (req, res) {
     var pNum = req.body.pNum;
     var mNum = req.body.mNum;
     console.log("요청: " + mNum);
 
     //현재 보고 있는 프로젝트에 승인된 사람인가요?
     var approve = await Recruit.findOne({
-        attributes : ["rApproval"],
+        attributes: ["rApproval"],
         where: {
             mNum: mNum,
             pNum: pNum
         }
     });
     var isApproval;
-    if(approve == null) {
+    if (approve == null) {
         isApproval = false;
     }
     else {
-        switch(approve.rApproval) {
+        switch (approve.rApproval) {
             case 0:
                 isApproval = false;
                 break;
@@ -381,32 +381,32 @@ app.post('/detailProject', async function(req, res){
 
     //프로젝트 정보
     var projectInfo = await ProjectInfo.findOne({
-        where: {pNum: pNum}
+        where: { pNum: pNum }
     });
     //스택 파싱
-    if(projectInfo.pStack != null) {
+    if (projectInfo.pStack != null) {
         var stacks = projectInfo.pStack.split(',');
         projectInfo.pStack = stacks;
     }
     //날짜 정보
     var projectState;
-    if(projectInfo.pState == 0){//모집중
+    if (projectInfo.pState == 0) {//모집중
         var pRecruitStart = moment(projectInfo.pRecruitStart);
         var pRecruitDue = moment(projectInfo.pRecruitDue);
         var due = pRecruitDue.diff(pRecruitStart, 'days')
         projectState = "D-" + due;
     }
-    else if(projectInfo.pState == 1) {//프로젝트 진행중
+    else if (projectInfo.pState == 1) {//프로젝트 진행중
         projectState = "ING";
     }
-    else if(projectInfo.pState == 2) {//프로젝트 종료
+    else if (projectInfo.pState == 2) {//프로젝트 종료
         projectState = "FIN";
     }
     //작성자 정보
     var writer = projectInfo.mNum;
     var writerInfo = await Member.findOne({
         attributes: ['mNum', 'mName', 'mPosition', 'mPhoto'],
-        where : {
+        where: {
             mNum: writer
         }
     });
@@ -425,44 +425,51 @@ app.post('/detailProject', async function(req, res){
 });
 
 //모집중 프로젝트 전체보기
-app.get('/recrutingProject', async function(req, res){
+app.get('/recrutingProject', async function (req, res) {
     //프로젝트 아이템 내용
     const recruitingProject = await ProjectInfo.findAll({
-        where:{
+        where: {
             pState: 0
-        }
-    });
-    //작성자
-    var writer = [];
-    for(var i=0; i<recruitingProject.length; i++) {
-        writer[i] = await Member.findOne({
+        },
+        include: [{
             attributes: ['mNum', 'mName'],
-            where:{mNum: recruitingProject[i].mNum}
-        });
+            model: Member
+        }]
+    });
+
+    var projectInfo = [];
+    for (var i = 0; i < recruitingProject.length; i++) {
+        var pRecruitStart = moment(recruitingProject.pRecruitStart);
+        var pRecruitDue = moment(recruitingProject.pRecruitDue);
+        var due = pRecruitDue.diff(pRecruitStart, 'days')
+        projectState = "D-" + due;
+        projectInfo[i] = {
+            recruitingProject: recruitingProject,
+            projectState: projectState
+        };
     }
 
     res.json({
         "code": 201,
-        "recruitingProject": recruitingProject,
-        "writer": writer
+        "projectInfo": projectInfo
     });
 
 });
 
 //모집 완료 프로젝트 전체보기
-app.get('/notRecruitingProject', async function(req, res){
+app.get('/notRecruitingProject', async function (req, res) {
     //프로젝트 아이템 내용
     const notRecruitingProject = await ProjectInfo.findAll({
-        where:{
-            [Op.or]: [{pState: 1}, {pState: 2}]
+        where: {
+            [Op.or]: [{ pState: 1 }, { pState: 2 }]
         }
     });
     //작성자
     var writer = [];
-    for(var i=0; i<notRecruitingProject.length; i++) {
+    for (var i = 0; i < notRecruitingProject.length; i++) {
         writer[i] = await Member.findOne({
             attributes: ['mNum', 'mName'],
-            where:{mNum: notRecruitingProject[i].mNum}
+            where: { mNum: notRecruitingProject[i].mNum }
         });
     }
 
@@ -474,7 +481,7 @@ app.get('/notRecruitingProject', async function(req, res){
 });
 
 //파트원 전체 보기
-app.get('/userAll', async function(req,res){
+app.get('/userAll', async function (req, res) {
     const userInfo = await Member.findAll({
         attributes: ['mNum', 'mName', 'mPosition', 'mIntroduction', 'mPhoto'],
         limit: 30
@@ -487,15 +494,15 @@ app.get('/userAll', async function(req,res){
 });
 
 //모집중인 프로젝트 검색
-app.post('/searchIng', async function(req,res){
+app.post('/searchIng', async function (req, res) {
     var keyword = req.body.keyword;
 
     var projectInfo = await ProjectInfo.findAll({
-        where:{
+        where: {
             pState: 0,
             [Op.or]: [
-                {pTitle: {[Op.like]: '%'+keyword+'%'}},
-                {pDescription: {[Op.like]: '%'+keyword+'%'}}
+                { pTitle: { [Op.like]: '%' + keyword + '%' } },
+                { pDescription: { [Op.like]: '%' + keyword + '%' } }
             ]
         },
         include: [{
@@ -511,15 +518,15 @@ app.post('/searchIng', async function(req,res){
 });
 
 //모집완료 프로젝트 검색
-app.post('/searchEd', async function(req,res){
+app.post('/searchEd', async function (req, res) {
     var keyword = req.body.keyword;
 
     var projectInfo = await ProjectInfo.findAll({
-        where:{
-            [Op.or]: [{pState: 1}, {pState: 2}],
+        where: {
+            [Op.or]: [{ pState: 1 }, { pState: 2 }],
             [Op.or]: [
-                {pTitle: {[Op.like]: '%'+keyword+'%'}},
-                {pDescription: {[Op.like]: '%'+keyword+'%'}}
+                { pTitle: { [Op.like]: '%' + keyword + '%' } },
+                { pDescription: { [Op.like]: '%' + keyword + '%' } }
             ]
         },
         include: [{
@@ -527,7 +534,7 @@ app.post('/searchEd', async function(req,res){
             model: Member
         }]
     });
-    
+
     res.json({
         "code": 201,
         "projectInfo": projectInfo
@@ -535,24 +542,24 @@ app.post('/searchEd', async function(req,res){
 });
 
 //프로젝트 공고 삭제
-app.post('/delProject', function(req, res) {
+app.post('/delProject', function (req, res) {
     var pNum = req.body.pNum;
 
-    ProjectInfo.destroy({where: {pNum: pNum}})
-    .then(()=>{
-        var message = "프로젝트 모집 공고가 삭제되었습니다.";
-        res.json({
-            "code": 201,
-            "message": message
+    ProjectInfo.destroy({ where: { pNum: pNum } })
+        .then(() => {
+            var message = "프로젝트 모집 공고가 삭제되었습니다.";
+            res.json({
+                "code": 201,
+                "message": message
+            })
         })
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 //프로젝트 지원
-app.post('/apply', async function(req, res) {
+app.post('/apply', async function (req, res) {
     var mNum = req.body.mNum;
     var pNum = req.body.pNum;
     var rPosition = req.body.rPosition;
@@ -564,7 +571,7 @@ app.post('/apply', async function(req, res) {
             pNum: pNum
         }
     });
-    if(alreadyApply == null) {
+    if (alreadyApply == null) {
         console.log("지원 성공");
         Recruit.create({
             mNum: mNum,
@@ -572,18 +579,18 @@ app.post('/apply', async function(req, res) {
             rApproval: 0,
             rPosition: rPosition
         })
-        .then(()=> {
-            var message = "지원이 완료되었습니다";
-            res.json({
-                "code": 201,
-                "message": message
+            .then(() => {
+                var message = "지원이 완료되었습니다";
+                res.json({
+                    "code": 201,
+                    "message": message
+                })
             })
-        })
-        .catch((err)=>{
-            console.log(err);
-        });
+            .catch((err) => {
+                console.log(err);
+            });
     }
-    else{
+    else {
         var message = "이미 지원한 프로젝트입니다";
         console.log(message)
         res.json({
@@ -591,11 +598,11 @@ app.post('/apply', async function(req, res) {
             "message": message
         });
     }
-    
+
 });
 
 //홈
-app.post('/home', async function(req, res) {
+app.post('/home', async function (req, res) {
     var mNum = req.body.mNum;
     var mPosition = req.body.mPosition;
     var mLevel = req.body.mLevel;
@@ -603,14 +610,14 @@ app.post('/home', async function(req, res) {
     //소속 플젝
     var projectInfoList1 = await ProjectInfo.findAll({
         include: [{
-            where : {
+            where: {
                 mNum: mNum,
                 rApproval: 1
             },
             model: Recruit,
         }]
     });
-    if(projectInfoList1.length < 3) {
+    if (projectInfoList1.length < 3) {
         list_belong = projectInfoList1;
     }
     else {
@@ -619,26 +626,26 @@ app.post('/home', async function(req, res) {
 
     //소속 프로젝트 공고 작성자
     var writerInfo_belong = [];
-    for(var i = 0; i < list_belong.length; i++) {
-        
+    for (var i = 0; i < list_belong.length; i++) {
+
         writerInfo_belong[i] = await Member.findAll({
-            attributes: ['mNum','mName'],
+            attributes: ['mNum', 'mName'],
             where: {
                 mNum: list_belong[i].mNum
             }
         });
     }
-    
+
 
     //추천 플젝
     var projectInfoList2 = [];
     var list_recommend = [];
-    switch(mPosition) {
+    switch (mPosition) {
         case 0:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
-                    pPlan: { [Op.gte]: 1},
-                    [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}],
+                    pPlan: { [Op.gte]: 1 },
+                    [Op.or]: [{ pPlanf: null }, { pPlanf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -646,8 +653,8 @@ app.post('/home', async function(req, res) {
         case 1:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
-                    pDesign: { [Op.gte]: 1},
-                    [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}],
+                    pDesign: { [Op.gte]: 1 },
+                    [Op.or]: [{ pDesignf: null }, { pDesignf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -655,8 +662,8 @@ app.post('/home', async function(req, res) {
         case 2:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
-                    pIos: { [Op.gte]: 1},
-                    [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}],
+                    pIos: { [Op.gte]: 1 },
+                    [Op.or]: [{ pIosf: null }, { pIosf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -664,8 +671,8 @@ app.post('/home', async function(req, res) {
         case 3:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
-                    pAos: { [Op.gte]: 1},
-                    [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}],
+                    pAos: { [Op.gte]: 1 },
+                    [Op.or]: [{ pAosf: null }, { pAosf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -673,8 +680,8 @@ app.post('/home', async function(req, res) {
         case 4:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
-                    pGame: { [Op.gte]: 1},
-                    [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}],
+                    pGame: { [Op.gte]: 1 },
+                    [Op.or]: [{ pGamef: null }, { pGamef: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -682,8 +689,8 @@ app.post('/home', async function(req, res) {
         case 5:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
-                    pWeb: { [Op.gte]: 1},
-                    [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}],
+                    pWeb: { [Op.gte]: 1 },
+                    [Op.or]: [{ pWebf: null }, { pWebf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -691,14 +698,14 @@ app.post('/home', async function(req, res) {
         case 6:
             projectInfoList2 = await ProjectInfo.findAll({
                 where: {
-                    pServer: { [Op.gte]: 1},
-                    [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}],
+                    pServer: { [Op.gte]: 1 },
+                    [Op.or]: [{ pServerf: null }, { pServerf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
             break;
     };
-    if(projectInfoList2.length < 3) {
+    if (projectInfoList2.length < 3) {
         list_recommend = projectInfoList2;
     }
     else {
@@ -707,10 +714,10 @@ app.post('/home', async function(req, res) {
 
     //추천 플젝 공고 작성자
     var writerInfo_recommend = [];
-    for(var i = 0; i < list_recommend.length; i++) {
-        
+    for (var i = 0; i < list_recommend.length; i++) {
+
         writerInfo_recommend[i] = await Member.findAll({
-            attributes: ['mNum','mName'],
+            attributes: ['mNum', 'mName'],
             where: {
                 mNum: list_recommend[i].mNum
             }
@@ -730,7 +737,7 @@ app.post('/home', async function(req, res) {
 
 
 //소속 프로젝트 전체 보기
-app.post('/getbelongedProject', async function(req, res) {
+app.post('/getbelongedProject', async function (req, res) {
     var mNum = req.body.mNum; //로그인 한 사용자
 
     //로그인한 사용자가 소속된 프로젝트 정보
@@ -738,7 +745,7 @@ app.post('/getbelongedProject', async function(req, res) {
         attributes: ['pNum', 'pTitle', 'pType', 'pOnOff', 'pStart', 'pDue', 'pState', 'mNum'],
         include: [{
             model: Recruit,
-            where : {
+            where: {
                 mNum: mNum,
                 rApproval: 1
             },
@@ -748,11 +755,11 @@ app.post('/getbelongedProject', async function(req, res) {
     //프로젝트 작성자 이름
     var writerNum = [];
     var writerInfo = [];
-    for(var i = 0; i < pInfo.length; i++) {
+    for (var i = 0; i < pInfo.length; i++) {
         writerNum[i] = pInfo[i].mNum;
 
         writerInfo[i] = await Member.findAll({
-            attributes: ['mNum','mName'],
+            attributes: ['mNum', 'mName'],
             where: {
                 mNum: writerNum[i]
             }
@@ -767,18 +774,18 @@ app.post('/getbelongedProject', async function(req, res) {
 });
 
 //추천 프로젝트 전체 보기
-app.post('/getRecommenedProject', async function(req, res){
+app.post('/getRecommenedProject', async function (req, res) {
     var mPosition = req.body.mPosition;
     var mLevel = req.body.mLevel;
     var pInfo = [];
     var writerInfo = [];
 
-    switch(mPosition) {
+    switch (mPosition) {
         case 0:
             pInfo = await ProjectInfo.findAll({
                 where: {
-                    pPlan: { [Op.gte]: 1},
-                    [Op.or]: [{pPlanf: null}, {pPlanf: {[Op.gte]: mLevel}}],
+                    pPlan: { [Op.gte]: 1 },
+                    [Op.or]: [{ pPlanf: null }, { pPlanf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -786,8 +793,8 @@ app.post('/getRecommenedProject', async function(req, res){
         case 1:
             pInfo = await ProjectInfo.findAll({
                 where: {
-                    pDesign: { [Op.gte]: 1},
-                    [Op.or]: [{pDesignf: null}, {pDesignf: {[Op.gte]: mLevel}}],
+                    pDesign: { [Op.gte]: 1 },
+                    [Op.or]: [{ pDesignf: null }, { pDesignf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -795,8 +802,8 @@ app.post('/getRecommenedProject', async function(req, res){
         case 2:
             pInfo = await ProjectInfo.findAll({
                 where: {
-                    pIos: { [Op.gte]: 1},
-                    [Op.or]: [{pIosf: null}, {pIosf: {[Op.gte]: mLevel}}],
+                    pIos: { [Op.gte]: 1 },
+                    [Op.or]: [{ pIosf: null }, { pIosf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -804,8 +811,8 @@ app.post('/getRecommenedProject', async function(req, res){
         case 3:
             pInfo = await ProjectInfo.findAll({
                 where: {
-                    pAos: { [Op.gte]: 1},
-                    [Op.or]: [{pAosf: null}, {pAosf: {[Op.gte]: mLevel}}],
+                    pAos: { [Op.gte]: 1 },
+                    [Op.or]: [{ pAosf: null }, { pAosf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -813,8 +820,8 @@ app.post('/getRecommenedProject', async function(req, res){
         case 4:
             pInfo = await ProjectInfo.findAll({
                 where: {
-                    pGame: { [Op.gte]: 1},
-                    [Op.or]: [{pGamef: null}, {pGamef: {[Op.gte]: mLevel}}],
+                    pGame: { [Op.gte]: 1 },
+                    [Op.or]: [{ pGamef: null }, { pGamef: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -822,8 +829,8 @@ app.post('/getRecommenedProject', async function(req, res){
         case 5:
             pInfo = await ProjectInfo.findAll({
                 where: {
-                    pWeb: { [Op.gte]: 1},
-                    [Op.or]: [{pWebf: null}, {pWebf: {[Op.gte]: mLevel}}],
+                    pWeb: { [Op.gte]: 1 },
+                    [Op.or]: [{ pWebf: null }, { pWebf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
@@ -831,19 +838,19 @@ app.post('/getRecommenedProject', async function(req, res){
         case 6:
             pInfo = await ProjectInfo.findAll({
                 where: {
-                    pServer: { [Op.gte]: 1},
-                    [Op.or]: [{pServerf: null}, {pServerf: {[Op.gte]: mLevel}}],
+                    pServer: { [Op.gte]: 1 },
+                    [Op.or]: [{ pServerf: null }, { pServerf: { [Op.gte]: mLevel } }],
                     pState: 0
                 }
             });
             break;
     };
-    
+
     //작성자 정보
-    for(var i = 0; i < pInfo.length; i++) {
-        
+    for (var i = 0; i < pInfo.length; i++) {
+
         writerInfo[i] = await Member.findAll({
-            attributes: ['mNum','mName'],
+            attributes: ['mNum', 'mName'],
             where: {
                 mNum: pInfo[i].mNum
             }
@@ -857,18 +864,18 @@ app.post('/getRecommenedProject', async function(req, res){
 });
 
 //마이페이지 내 정보 불러오기
-app.post('/myPage', async function(req, res){
+app.post('/myPage', async function (req, res) {
     var mNum = req.body.mNum;
     console.log("로그인된 사용자: " + mNum);
 
     var mInfo = await Member.findOne({
-        where:{
+        where: {
             mNum: mNum
         }
     });
 
     //스택 파싱
-    if(mInfo.mStacks != null) {
+    if (mInfo.mStacks != null) {
         var stacks = mInfo.mStacks.split(',');
         mInfo.mStacks = stacks;
     }
@@ -882,7 +889,7 @@ app.post('/myPage', async function(req, res){
 });
 
 //기본정보 수정
-app.post('/editBasicInfo', async function(req, res) {
+app.post('/editBasicInfo', async function (req, res) {
     var mNum = req.body.mNum;
     var mEmail = req.body.mEmail;
     var mDept = req.body.mDept;
@@ -890,14 +897,18 @@ app.post('/editBasicInfo', async function(req, res) {
     var mGender = req.body.mGender;
 
     Member.update(
-        {mEmail: mEmail,
-        mDept: mDept,
-        mAcademic: mAcademic,
-        mGender: mGender},
-        {where: {
-            mNum: mNum
-        }})
-        .then(()=>{
+        {
+            mEmail: mEmail,
+            mDept: mDept,
+            mAcademic: mAcademic,
+            mGender: mGender
+        },
+        {
+            where: {
+                mNum: mNum
+            }
+        })
+        .then(() => {
             var message = "회원정보가 수정되었습니다."
             var result = true;
 
@@ -907,13 +918,13 @@ app.post('/editBasicInfo', async function(req, res) {
                 "result": result
             });
         })
-        .catch((err)=>{
+        .catch((err) => {
             console.log(err);
         })
 });
 
 //링크 수정
-app.post('/updateLink', async function(req, res){
+app.post('/updateLink', async function (req, res) {
     var mNum = req.body.mNum;
     var mGit = req.body.mGit;
     var mNotion = req.body.mNotion;
@@ -928,53 +939,53 @@ app.post('/updateLink', async function(req, res){
             mNum: mNum
         }
     })
-    .then(()=>{
-        var message = "링크 정보가 수정되었습니다";
-        var result = true;
-        res.json({
-            "code": 201,
-            "message": message,
-            "result": result
+        .then(() => {
+            var message = "링크 정보가 수정되었습니다";
+            var result = true;
+            res.json({
+                "code": 201,
+                "message": message,
+                "result": result
+            })
         })
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 //스택 수정
-app.post('/updateStack', async function(req,res){
+app.post('/updateStack', async function (req, res) {
     var mNum = req.body.mNum;
     var mStacks = req.body.mStacks;
     console.log(req);
     Member.update({
         mStacks: mStacks
     }, {
-        where: {mNum: mNum}
+        where: { mNum: mNum }
     })
-    .then(()=>{
-        var message = "스택 수정이 완료되었습니다";
-        var result = true;
-        res.json({
-            "code": 201,
-            "result": result,
-            "message": message
+        .then(() => {
+            var message = "스택 수정이 완료되었습니다";
+            var result = true;
+            res.json({
+                "code": 201,
+                "result": result,
+                "message": message
+            });
+        })
+        .catch((err) => {
+            console.log(err);
         });
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
 });
 
 //프로필 수정
-app.post('/updateProfile', upload.single('file'), async function(req, res){
+app.post('/updateProfile', upload.single('file'), async function (req, res) {
     var mNum = req.body.mNum;
     var mName = req.body.mName;
     var mPosition = req.body.mPosition;
     var mLevel = req.body.mLevel;
     var mIntroduction = req.body.mIntroduction;
-    
-    var imgData = readImageFile('./uploads/'+req.file.filename);
+
+    var imgData = readImageFile('./uploads/' + req.file.filename);
 
     Member.update({
         mName: mName,
@@ -983,24 +994,24 @@ app.post('/updateProfile', upload.single('file'), async function(req, res){
         mIntroduction: mIntroduction,
         mPhoto: imgData
     }, {
-        where: {mNum: mNum}
+        where: { mNum: mNum }
     })
-    .then(()=>{
-        var message = "프로필이 수정되었습니다."
-        var result = true;
-        res.json({
-            "code": 201,
-            "message": message,
-            "result": result
+        .then(() => {
+            var message = "프로필이 수정되었습니다."
+            var result = true;
+            res.json({
+                "code": 201,
+                "message": message,
+                "result": result
+            })
         })
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 //마이페이지: 프로젝트 개수
-app.post('/countProject', async function(req, res) {
+app.post('/countProject', async function (req, res) {
     var mNum = req.body.mNum;
 
     var joinedProject = await Recruit.findAll({
@@ -1024,7 +1035,7 @@ app.post('/countProject', async function(req, res) {
     });
 
     var zzimProject = await Zzim.findAll({
-        where :{
+        where: {
             mNum: mNum
         }
     });
@@ -1039,12 +1050,12 @@ app.post('/countProject', async function(req, res) {
 });
 
 //마이페이지: 내 평가 보기
-app.post('/myEvaluation', async function(req,res){
+app.post('/myEvaluation', async function (req, res) {
     var mNum = req.body.mNum;
 
     var myEvaluations = await Evaluation.findAll({
         attributes: ['eNum', 'eComment', 'mNum'],
-        where: {ePerson: mNum},
+        where: { ePerson: mNum },
         include: [{
             attributes: ['pNum', 'pTitle'],
             model: ProjectInfo
@@ -1052,10 +1063,10 @@ app.post('/myEvaluation', async function(req,res){
     });
 
     var evaluationList = [];
-    for(var i=0; i<myEvaluations.length; i++) {
+    for (var i = 0; i < myEvaluations.length; i++) {
         var writer = await Member.findOne({
             attributes: ['mNum', 'mName', 'mPhoto'],
-            where: {mNum: myEvaluations[i].mNum}
+            where: { mNum: myEvaluations[i].mNum }
         })
         evaluationList[i] = {
             evaluation: myEvaluations[i],
@@ -1070,7 +1081,7 @@ app.post('/myEvaluation', async function(req,res){
 });
 
 //피드 작성용 바텀시트
-app.post('/finishedProject', async function(req, res) {
+app.post('/finishedProject', async function (req, res) {
     var mNum = req.body.mNum;
 
     var project = await ProjectInfo.findAll({
@@ -1094,7 +1105,7 @@ app.post('/finishedProject', async function(req, res) {
 });
 
 //피드 작성
-app.post('/addFeed', upload.single('file'), async function(req, res){
+app.post('/addFeed', upload.single('file'), async function (req, res) {
     console.log("req.file: " + req.file);
     var fTitle = req.body.fTitle;
     var fType = req.body.fType;
@@ -1102,10 +1113,10 @@ app.post('/addFeed', upload.single('file'), async function(req, res){
     var fLink = req.body.fLink;
     var mNum = req.body.mNum;
     var pNum = req.body.pNum;
-    
+
 
     //이미지 파일 db에 넣기
-    var imgData = readImageFile('./uploads/'+req.file.filename);
+    var imgData = readImageFile('./uploads/' + req.file.filename);
     var url = req.file.path
 
     Feed.create({
@@ -1118,37 +1129,37 @@ app.post('/addFeed', upload.single('file'), async function(req, res){
         pNum: pNum,
         fTest: url
     })
-    .then(()=>{
-        var message = "피드 등록이 완료되었습니다";
-        res.json({
-            "code": 201,
-            "message": message
+        .then(() => {
+            var message = "피드 등록이 완료되었습니다";
+            res.json({
+                "code": 201,
+                "message": message
+            })
         })
-    })
-    .catch((err)=>{
-        console.log(err);
-    })
+        .catch((err) => {
+            console.log(err);
+        })
 });
 
 //피드 삭제
-app.post('/deleteFeed', async function(req, res) {
+app.post('/deleteFeed', async function (req, res) {
     var fNum = req.body.fNum;
 
-    Feed.destroy({ where: {fNum: fNum}})
-    .then(()=>{
-        var message = "피드가 삭제되었습니다";
-        res.json({
-            "code": 201,
-            "message": message
+    Feed.destroy({ where: { fNum: fNum } })
+        .then(() => {
+            var message = "피드가 삭제되었습니다";
+            res.json({
+                "code": 201,
+                "message": message
+            })
         })
-    })
-    .catch((err)=>{
-        console.log(err);
-    })
+        .catch((err) => {
+            console.log(err);
+        })
 });
 
 //피드 전체 보기
-app.get('/getAllFeed', async function(req, res){
+app.get('/getAllFeed', async function (req, res) {
     var feeds = await Feed.findAll({
         attributes: ['fNum', 'fTitle', 'fPhoto', 'fTest']
     });
@@ -1160,7 +1171,7 @@ app.get('/getAllFeed', async function(req, res){
 });
 
 //피드 상세 보기
-app.post('/detailFeed', async function(req, res){
+app.post('/detailFeed', async function (req, res) {
     var fNum = req.body.fNum;
 
     //피드 정보
@@ -1169,7 +1180,7 @@ app.post('/detailFeed', async function(req, res){
             attributes: ['mNum', 'mName', 'mPhoto'],
             model: Member
         }],
-        where: {fNum: fNum}
+        where: { fNum: fNum }
     });
 
     //방법1
@@ -1178,9 +1189,9 @@ app.post('/detailFeed', async function(req, res){
     console.log(imageData);
     const result = bufferImage(imageData);
     */
-   const imageData = feedInfo.fPhoto;
-   console.log(imageData);
-   
+    const imageData = feedInfo.fPhoto;
+    console.log(imageData);
+
     res.json({
         "code": 201,
         "feedInfo": feedInfo,
@@ -1189,7 +1200,7 @@ app.post('/detailFeed', async function(req, res){
 });
 
 //승인된 팀원 정보 - 전체
-app.post('/teamMember', async function(req, res){
+app.post('/teamMember', async function (req, res) {
     var pNum = req.body.pNum;
 
     var approvedPlan = await Member.findAll({
@@ -1247,7 +1258,7 @@ app.post('/teamMember', async function(req, res){
             }
         }]
     });
-      
+
     var approvedGame = await Member.findAll({
         attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
         include: [{
@@ -1284,7 +1295,7 @@ app.post('/teamMember', async function(req, res){
 });
 
 //승인된 팀원 정보 - 기획
-app.post('/memberPlanner', async function(req, res){
+app.post('/memberPlanner', async function (req, res) {
     var pNum = req.body.pNum;
 
     var approvedPlan = await Member.findAll({
@@ -1306,7 +1317,7 @@ app.post('/memberPlanner', async function(req, res){
 });
 
 //승인된 팀원 정보 - 디자인
-app.post('/memberDesigner', async function(req, res){
+app.post('/memberDesigner', async function (req, res) {
     var pNum = req.body.pNum;
 
     var approvedDesign = await Member.findAll({
@@ -1328,7 +1339,7 @@ app.post('/memberDesigner', async function(req, res){
 });
 
 //승인된 팀원 정보 - ios
-app.post('/memberIos', async function(req, res){
+app.post('/memberIos', async function (req, res) {
     var pNum = req.body.pNum;
 
     var approvedIos = await Member.findAll({
@@ -1350,7 +1361,7 @@ app.post('/memberIos', async function(req, res){
 });
 
 //승인된 팀원 정보 - aos
-app.post('/memberAos', async function(req, res){
+app.post('/memberAos', async function (req, res) {
     var pNum = req.body.pNum;
 
     var approvedAos = await Member.findAll({
@@ -1372,7 +1383,7 @@ app.post('/memberAos', async function(req, res){
 });
 
 //승인된 팀원 정보 - 웹
-app.post('/memberWeb', async function(req, res){
+app.post('/memberWeb', async function (req, res) {
     var pNum = req.body.pNum;
 
     var approvedDesign = await Member.findAll({
@@ -1393,7 +1404,7 @@ app.post('/memberWeb', async function(req, res){
     });
 });
 //승인된 팀원 정보 - 게임
-app.post('/memberGame', async function(req, res){
+app.post('/memberGame', async function (req, res) {
     var pNum = req.body.pNum;
 
     var approvedGame = await Member.findAll({
@@ -1415,7 +1426,7 @@ app.post('/memberGame', async function(req, res){
 });
 
 //승인된 팀원 정보 - 서버
-app.post('/memberServer', async function(req, res){
+app.post('/memberServer', async function (req, res) {
     var pNum = req.body.pNum;
 
     var approvedServer = await Member.findAll({
@@ -1437,21 +1448,21 @@ app.post('/memberServer', async function(req, res){
 });
 
 //마이페이지 - 찜한 프로젝트 조회
-app.post('/myZzimList', async function(req, res){
+app.post('/myZzimList', async function (req, res) {
     var mNum = req.body.mNum;
 
     var projectInfoList = await ProjectInfo.findAll({
         include: [{
             model: Zzim,
-            where: {mNum: mNum}
+            where: { mNum: mNum }
         }]
     });
     //작성자
     var writer = [];
-    for(var i=0; i<projectInfoList.length; i++) {
+    for (var i = 0; i < projectInfoList.length; i++) {
         writer[i] = await Member.findOne({
             attributes: ['mNum', 'mName'],
-            where:{mNum: projectInfoList[i].mNum}
+            where: { mNum: projectInfoList[i].mNum }
         });
     }
     res.json({
@@ -1462,7 +1473,7 @@ app.post('/myZzimList', async function(req, res){
 });
 
 //승인 대기중인 공고
-app.post('/myWaitingApproval', async function(req, res){
+app.post('/myWaitingApproval', async function (req, res) {
     var mNum = req.body.mNum;
 
     var projectInfoList = await ProjectInfo.findAll({
@@ -1479,10 +1490,10 @@ app.post('/myWaitingApproval', async function(req, res){
     });
     //작성자
     var writer = [];
-    for(var i=0; i<projectInfoList.length; i++) {
+    for (var i = 0; i < projectInfoList.length; i++) {
         writer[i] = await Member.findOne({
             attributes: ['mNum', 'mName'],
-            where:{mNum: projectInfoList[i].mNum}
+            where: { mNum: projectInfoList[i].mNum }
         });
     }
 
@@ -1494,26 +1505,26 @@ app.post('/myWaitingApproval', async function(req, res){
 });
 
 //참여 중인 프로젝트
-app.post('/myIngProject', async function(req,res){
+app.post('/myIngProject', async function (req, res) {
     var mNum = req.body.mNum;
 
     var projectInfoList = await ProjectInfo.findAll({
-        include:[{
+        include: [{
             model: Recruit,
-            where:{
+            where: {
                 mNum: mNum,
                 rApproval: 1
             }
         }],
-        where: {pState: 1}
+        where: { pState: 1 }
     });
 
     //작성자
     var writer = [];
-    for(var i=0; i<projectInfoList.length; i++) {
+    for (var i = 0; i < projectInfoList.length; i++) {
         writer[i] = await Member.findOne({
             attributes: ['mNum', 'mName'],
-            where:{mNum: projectInfoList[i].mNum}
+            where: { mNum: projectInfoList[i].mNum }
         });
     }
 
@@ -1525,24 +1536,24 @@ app.post('/myIngProject', async function(req,res){
 });
 
 //참여 완료 프로젝트
-app.post('/myEndProject', async function(req,res){
+app.post('/myEndProject', async function (req, res) {
     var mNum = req.body.mNum;
     var projectInfoList = await ProjectInfo.findAll({
-        include:[{
+        include: [{
             model: Recruit,
-            where:{
+            where: {
                 mNum: mNum,
                 rApproval: 1
             }
         }],
-        where: {pState:2}
+        where: { pState: 2 }
     });
     //작성자
     var writer = [];
-    for(var i=0; i<projectInfoList.length; i++) {
+    for (var i = 0; i < projectInfoList.length; i++) {
         writer[i] = await Member.findOne({
             attributes: ['mNum', 'mName'],
-            where:{mNum: projectInfoList[i].mNum}
+            where: { mNum: projectInfoList[i].mNum }
         });
     }
 
@@ -1554,11 +1565,11 @@ app.post('/myEndProject', async function(req,res){
 });
 
 //업로드한 프로젝트
-app.post('/myUploadProject', async function(req,res){
+app.post('/myUploadProject', async function (req, res) {
     var mNum = req.body.mNum;
 
     var projectInfoList = await ProjectInfo.findAll({
-        where:{mNum: mNum}
+        where: { mNum: mNum }
     });
 
     res.json({
@@ -1568,7 +1579,7 @@ app.post('/myUploadProject', async function(req,res){
 });
 
 //내가 속한 프로젝트의 피드
-app.post('/myFeeds', async function(req,res){
+app.post('/myFeeds', async function (req, res) {
     var mNum = req.body.mNum;
 
     var pNums = await ProjectInfo.findAll({
@@ -1580,14 +1591,14 @@ app.post('/myFeeds', async function(req,res){
                 rApproval: 1
             }
         }],
-        where: {pState: 2}
+        where: { pState: 2 }
     });
 
     var feeds = [];
-    for(var i = 0; i<pNums.length;i++){
+    for (var i = 0; i < pNums.length; i++) {
         var feed_project = await Feed.findOne({
             attributes: ['fNum', 'fTitle', 'fTest'],
-            where: {pNum: pNums[i].pNum}
+            where: { pNum: pNums[i].pNum }
         });
         feeds[i] = feed_project;
     }
@@ -1599,19 +1610,103 @@ app.post('/myFeeds', async function(req,res){
 });
 
 //투두 작성용 팀원 조회
-app.post('/todoMember', async function(req,res){
+app.post('/todoMember', async function (req, res) {
+    var part = req.body.part;
     var pNum = req.body.pNum;
-
-    var members = await Member.findAll({
-        attributes: ['mNum', 'mName', 'mPhoto', 'mPosition'],
-        include: [{
-            model: Recruit,
-            where: {
-                pNum: pNum,
-                rApproval: 1
-            }
-        }]
-    });
+    var members = [];
+    switch (part) {
+        case 0:
+            members = await Member.findAll({
+                attributes: ['mNum', 'mName', 'mPhoto'],
+                include: [{
+                    model: Recruit,
+                    where: {
+                        pNum: pNum,
+                        rPosition: 0,
+                        rApproval: 1
+                    }
+                }]
+            });
+            break;
+        case 1:
+            members = await Member.findAll({
+                attributes: ['mNum', 'mName', 'mPhoto'],
+                include: [{
+                    model: Recruit,
+                    where: {
+                        pNum: pNum,
+                        rPosition: 1,
+                        rApproval: 1
+                    }
+                }]
+            });
+            break;
+        case 2:
+            members = await Member.findAll({
+                attributes: ['mNum', 'mName', 'mPhoto'],
+                include: [{
+                    model: Recruit,
+                    where: {
+                        pNum: pNum,
+                        rPosition: 2,
+                        rApproval: 1
+                    }
+                }]
+            });
+            break;
+        case 3:
+            members = await Member.findAll({
+                attributes: ['mNum', 'mName', 'mPhoto'],
+                include: [{
+                    model: Recruit,
+                    where: {
+                        pNum: pNum,
+                        rPosition: 3,
+                        rApproval: 1
+                    }
+                }]
+            });
+            break;
+        case 4:
+            members = await Member.findAll({
+                attributes: ['mNum', 'mName', 'mPhoto'],
+                include: [{
+                    model: Recruit,
+                    where: {
+                        pNum: pNum,
+                        rPosition: 4,
+                        rApproval: 1
+                    }
+                }]
+            });
+            break;
+        case 5:
+            members = await Member.findAll({
+                attributes: ['mNum', 'mName', 'mPhoto'],
+                include: [{
+                    model: Recruit,
+                    where: {
+                        pNum: pNum,
+                        rPosition: 5,
+                        rApproval: 1
+                    }
+                }]
+            });
+            break;
+        case 6:
+            members = await Member.findAll({
+                attributes: ['mNum', 'mName', 'mPhoto'],
+                include: [{
+                    model: Recruit,
+                    where: {
+                        pNum: pNum,
+                        rPosition: 6,
+                        rApproval: 1
+                    }
+                }]
+            });
+            break;
+    };
 
     res.json({
         "code": 201,
@@ -1620,80 +1715,84 @@ app.post('/todoMember', async function(req,res){
 });
 
 //투두 작성
-app.post('/addTodo', async function(req,res){
+app.post('/addTodo', async function (req, res) {
     var tTodo = req.body.tTodo;
+    var tPart = req.body.tPart;
     var tDday = req.body.tDday;
     var mNums = req.body.mNums;
     var pNum = req.body.pNum;
 
     Todo.create({
         tTodo: tTodo,
+        tPart: tPart,
         tDday: tDday,
         mNums: mNums,
         tState: 0,
         pNum: pNum
     })
-    .then(()=>{
-        var message = "투두가 등록되었습니다.";
-        res.json({
-            "code": 201,
-            "message": message
+        .then(() => {
+            var message = "투두가 등록되었습니다.";
+            res.json({
+                "code": 201,
+                "message": message
+            });
+        })
+        .catch((err) => {
+            console.log(err);
         });
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
 });
 
 //투두 수정
-app.post('/updateTodo', async function(req,res){
+app.post('/updateTodo', async function (req, res) {
     var tNum = req.body.tNum;
     var tTodo = req.body.tTodo;
+    var tPart = req.body.tPart;
     var tDday = req.body.tDday;
     var mNums = req.body.mNums;
     var pNum = req.body.pNum;
 
     Todo.update({
         tTodo: tTodo,
+        tPart: tPart,
         tDday: tDday,
         mNums: mNums,
         pNum: pNum
-    },{
-        where: {tNum: tNum}
+    }, {
+        where: { tNum: tNum }
     })
-    .then(()=>{
-        var message = "투두가 수정되었습니다.";
-        res.json({
-            "code": 201,
-            "message": message
+        .then(() => {
+            var message = "투두가 수정되었습니다.";
+            res.json({
+                "code": 201,
+                "message": message
+            });
         });
-    });
 });
 
 //투두 상태 업데이트
-app.post('/updateTodoState', async function(req,res){
+app.post('/updateTodoState', async function (req, res) {
     var tNum = req.body.tNum;
-    
+
     var nowState = await Todo.findOne({
         attributes: ['tState'],
-        where: {tNum: tNum}
+        where: { tNum: tNum }
     });
 
     console.log(nowState.tState);
 
     var updateState;
-    if(nowState.tState == 0) {
+    if (nowState.tState == 0) {
         updateState = await Todo.update({
             tState: 1,
         }, {
-            where: {tNum: tNum}
+            where: { tNum: tNum }
         });
     }
-    else if(nowState.tState == 1){
+    else if (nowState.tState == 1) {
         updateState = await Todo.update({
             tState: 0,
         }, {
-            where: {tNum: tNum}
+            where: { tNum: tNum }
         });
     }
 
@@ -1703,42 +1802,261 @@ app.post('/updateTodoState', async function(req,res){
 });
 
 //투두 삭제
-app.post('/deleteTodo', async function(req,res){
+app.post('/deleteTodo', async function (req, res) {
     var tNum = req.body.tNum;
 
-    Todo.destroy({where: {tNum: tNum}})
-    .then((result)=>{
-        var message = "투두가 삭제되었습니다.";
-        res.json({
-            "code": 201,
-            "message": message
+    Todo.destroy({ where: { tNum: tNum } })
+        .then((result) => {
+            var message = "투두가 삭제되었습니다.";
+            res.json({
+                "code": 201,
+                "message": message
+            });
+        })
+        .catch((err) => {
+            console.log(err);
         });
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
 });
 
-//투두 전체 보기
-app.post('/allTodo', async function(req,res){
+//투두 전체 보기_기획
+app.post('/allTodoPlan', async function (req, res) {
     var pNum = req.body.pNum;
 
     var todoInfo = await Todo.findAll({
-        where: {pNum: pNum}
+        where: { 
+            pNum: pNum,
+            tPart: 0
+        }
     });
 
     var todoList = [];
 
     //담당자
-    for(var i=0; i<todoInfo.length; i++) {
+    for (var i = 0; i < todoInfo.length; i++) {
         var mNums = todoInfo[i].mNums.split(',');
-        console.log('담당자 리스트: '+ mNums);
-        var memberInfo=[];
-        for(var j=0; j<mNums.length; j++) {
-            console.log('담당자 정보: '+ mNums[j]);
+        console.log('담당자 리스트: ' + mNums);
+        var memberInfo = [];
+        for (var j = 0; j < mNums.length; j++) {
+            console.log('담당자 정보: ' + mNums[j]);
             memberInfo[j] = await Member.findOne({
                 attributes: ['mNum', 'mPhoto'],
-                where: {mNum: mNums[j]}
+                where: { mNum: mNums[j] }
+            });
+        }
+        todoList[i] = {
+            todoInfo: todoInfo[i],
+            members: memberInfo
+        };
+    }
+
+    res.json({
+        "code": 201,
+        "todoList": todoList
+    });
+});
+//투두 전체 보기_디자인
+app.post('/allTodoDesign', async function (req, res) {
+    var pNum = req.body.pNum;
+
+    var todoInfo = await Todo.findAll({
+        where: { 
+            pNum: pNum,
+            tPart: 1
+        }
+    });
+
+    var todoList = [];
+
+    //담당자
+    for (var i = 0; i < todoInfo.length; i++) {
+        var mNums = todoInfo[i].mNums.split(',');
+        console.log('담당자 리스트: ' + mNums);
+        var memberInfo = [];
+        for (var j = 0; j < mNums.length; j++) {
+            console.log('담당자 정보: ' + mNums[j]);
+            memberInfo[j] = await Member.findOne({
+                attributes: ['mNum', 'mPhoto'],
+                where: { mNum: mNums[j] }
+            });
+        }
+        todoList[i] = {
+            todoInfo: todoInfo[i],
+            members: memberInfo
+        };
+    }
+
+    res.json({
+        "code": 201,
+        "todoList": todoList
+    });
+});
+//투두 전체 보기_ios
+app.post('/allTodoIos', async function (req, res) {
+    var pNum = req.body.pNum;
+
+    var todoInfo = await Todo.findAll({
+        where: { 
+            pNum: pNum,
+            tPart: 2
+        }
+    });
+
+    var todoList = [];
+
+    //담당자
+    for (var i = 0; i < todoInfo.length; i++) {
+        var mNums = todoInfo[i].mNums.split(',');
+        console.log('담당자 리스트: ' + mNums);
+        var memberInfo = [];
+        for (var j = 0; j < mNums.length; j++) {
+            console.log('담당자 정보: ' + mNums[j]);
+            memberInfo[j] = await Member.findOne({
+                attributes: ['mNum', 'mPhoto'],
+                where: { mNum: mNums[j] }
+            });
+        }
+        todoList[i] = {
+            todoInfo: todoInfo[i],
+            members: memberInfo
+        };
+    }
+
+    res.json({
+        "code": 201,
+        "todoList": todoList
+    });
+});
+//투두 전체 보기_aos
+app.post('/allTodoAos', async function (req, res) {
+    var pNum = req.body.pNum;
+
+    var todoInfo = await Todo.findAll({
+        where: { 
+            pNum: pNum,
+            tPart: 3
+        }
+    });
+
+    var todoList = [];
+
+    //담당자
+    for (var i = 0; i < todoInfo.length; i++) {
+        var mNums = todoInfo[i].mNums.split(',');
+        console.log('담당자 리스트: ' + mNums);
+        var memberInfo = [];
+        for (var j = 0; j < mNums.length; j++) {
+            console.log('담당자 정보: ' + mNums[j]);
+            memberInfo[j] = await Member.findOne({
+                attributes: ['mNum', 'mPhoto'],
+                where: { mNum: mNums[j] }
+            });
+        }
+        todoList[i] = {
+            todoInfo: todoInfo[i],
+            members: memberInfo
+        };
+    }
+
+    res.json({
+        "code": 201,
+        "todoList": todoList
+    });
+});
+//투두 전체 보기_웹
+app.post('/allTodoWeb', async function (req, res) {
+    var pNum = req.body.pNum;
+
+    var todoInfo = await Todo.findAll({
+        where: { 
+            pNum: pNum,
+            tPart: 4
+        }
+    });
+
+    var todoList = [];
+
+    //담당자
+    for (var i = 0; i < todoInfo.length; i++) {
+        var mNums = todoInfo[i].mNums.split(',');
+        console.log('담당자 리스트: ' + mNums);
+        var memberInfo = [];
+        for (var j = 0; j < mNums.length; j++) {
+            console.log('담당자 정보: ' + mNums[j]);
+            memberInfo[j] = await Member.findOne({
+                attributes: ['mNum', 'mPhoto'],
+                where: { mNum: mNums[j] }
+            });
+        }
+        todoList[i] = {
+            todoInfo: todoInfo[i],
+            members: memberInfo
+        };
+    }
+
+    res.json({
+        "code": 201,
+        "todoList": todoList
+    });
+});
+//투두 전체 보기_게임
+app.post('/allTodoGame', async function (req, res) {
+    var pNum = req.body.pNum;
+
+    var todoInfo = await Todo.findAll({
+        where: { 
+            pNum: pNum,
+            tPart: 5
+        }
+    });
+
+    var todoList = [];
+
+    //담당자
+    for (var i = 0; i < todoInfo.length; i++) {
+        var mNums = todoInfo[i].mNums.split(',');
+        console.log('담당자 리스트: ' + mNums);
+        var memberInfo = [];
+        for (var j = 0; j < mNums.length; j++) {
+            console.log('담당자 정보: ' + mNums[j]);
+            memberInfo[j] = await Member.findOne({
+                attributes: ['mNum', 'mPhoto'],
+                where: { mNum: mNums[j] }
+            });
+        }
+        todoList[i] = {
+            todoInfo: todoInfo[i],
+            members: memberInfo
+        };
+    }
+
+    res.json({
+        "code": 201,
+        "todoList": todoList
+    });
+});
+//투두 전체 보기_서버
+app.post('/allTodoServer', async function (req, res) {
+    var pNum = req.body.pNum;
+
+    var todoInfo = await Todo.findAll({
+        where: { 
+            pNum: pNum,
+            tPart: 6
+        }
+    });
+
+    var todoList = [];
+
+    //담당자
+    for (var i = 0; i < todoInfo.length; i++) {
+        var mNums = todoInfo[i].mNums.split(',');
+        console.log('담당자 리스트: ' + mNums);
+        var memberInfo = [];
+        for (var j = 0; j < mNums.length; j++) {
+            console.log('담당자 정보: ' + mNums[j]);
+            memberInfo[j] = await Member.findOne({
+                attributes: ['mNum', 'mPhoto'],
+                where: { mNum: mNums[j] }
             });
         }
         todoList[i] = {
@@ -1754,7 +2072,7 @@ app.post('/allTodo', async function(req,res){
 });
 
 //평가를 입력하지 않은 팀원 불러오기
-app.post('/notEveluate', async function(req,res){
+app.post('/notEveluate', async function (req, res) {
     var pNum = req.body.pNum; //프로젝트
     var mNum = req.body.mNum; //평가자
 
@@ -1771,13 +2089,13 @@ app.post('/notEveluate', async function(req,res){
 
     var alreadyEvaluate = await Evaluation.findAll({
         attributes: ['ePerson'],
-        where: {mNum: mNum}
+        where: { mNum: mNum }
     });
 
-    for(var i=0; i<alreadyEvaluate.length; i++){
+    for (var i = 0; i < alreadyEvaluate.length; i++) {
         var key = alreadyEvaluate[i].ePerson;
-        for(var j=0; j<members.length; j++) {
-            if(members[j].mNum == key || members[j].mNum == mNum) {
+        for (var j = 0; j < members.length; j++) {
+            if (members[j].mNum == key || members[j].mNum == mNum) {
                 members.splice(j, 1);
                 j--;
             }
@@ -1791,7 +2109,7 @@ app.post('/notEveluate', async function(req,res){
 });
 
 //이미 평가한 팀원 불러오기
-app.post('/alreadyEvaluate', async function(req,res){
+app.post('/alreadyEvaluate', async function (req, res) {
     var pNum = req.body.pNum; //프로젝트
     var mNum = req.body.mNum; //평가자
 
@@ -1804,10 +2122,10 @@ app.post('/alreadyEvaluate', async function(req,res){
     });
 
     var members = [];
-    for(var i=0; i<evaluated.length; i++) {
+    for (var i = 0; i < evaluated.length; i++) {
         members[i] = await Member.findOne({
             attributes: ['mNum', 'mName', 'mPhoto', 'mPosition'],
-            where: {mNum: evaluated[i].ePerson}
+            where: { mNum: evaluated[i].ePerson }
         });
     }
 
@@ -1818,7 +2136,7 @@ app.post('/alreadyEvaluate', async function(req,res){
 });
 
 //평가 입력하기
-app.post('/addEvaluate', async function(req, res){
+app.post('/addEvaluate', async function (req, res) {
     var mNum = req.body.mNum;//평가자
     var pNum = req.body.pNum;
     var ePerson = req.body.ePerson; //평가 대상
@@ -1832,14 +2150,14 @@ app.post('/addEvaluate', async function(req, res){
             ePerson: ePerson
         }
     });
-    if(is_evaluate.length != 0) {
+    if (is_evaluate.length != 0) {
         var message = "이미 평가를 입력한 팀원입니다."
         res.json({
             "code": 201,
             "message": message
         });
     }
-    else{
+    else {
         Evaluation.create({
             mNum: mNum,
             pNum: pNum,
@@ -1847,21 +2165,21 @@ app.post('/addEvaluate', async function(req, res){
             eRecommend: eRecommend,
             eComment: eComment
         })
-        .then(()=>{
-            var message = "평가가 입력되었습니다.";
-            res.json({
-                "code": 202,
-                "message": message
+            .then(() => {
+                var message = "평가가 입력되었습니다.";
+                res.json({
+                    "code": 202,
+                    "message": message
+                });
+            })
+            .catch((err) => {
+                console.log(err);
             });
-        })
-        .catch((err)=>{
-            console.log(err);
-        });
     }
 });
 
 //내가 입력한 평가 보기
-app.post('/checkEvaluation', async function(req,res){
+app.post('/checkEvaluation', async function (req, res) {
     var mNum = req.body.mNum; //로그인한 사용자
     var ePerson = req.body.ePerson; //평가 대상자
     var pNum = req.body.pNum;
@@ -1882,20 +2200,20 @@ app.post('/checkEvaluation', async function(req,res){
 });
 
 //평가 삭제
-app.post('/deleteEvaluation', async function(req,res){
+app.post('/deleteEvaluation', async function (req, res) {
     var eNum = req.body.eNum;
 
     Evaluation.destroy({
-        where: {eNum: eNum}
+        where: { eNum: eNum }
     })
-    .then(()=>{
-        var message = "평가가 삭제되었습니다";
-        res.json({
-            "code": 201,
-            "message": message
+        .then(() => {
+            var message = "평가가 삭제되었습니다";
+            res.json({
+                "code": 201,
+                "message": message
+            });
+        })
+        .catch((err) => {
+            console.log(err);
         });
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
-})
+});

@@ -12,6 +12,10 @@ module.exports = class Todo extends Sequelize.Model {
                 type: Sequelize.STRING(100),
                 allowNull: false
             },
+            tPart: {
+                type: Sequelize.INTEGER,
+                allowNull: false
+            },
             tWritedate: {
                 type: Sequelize.DATE
             },
