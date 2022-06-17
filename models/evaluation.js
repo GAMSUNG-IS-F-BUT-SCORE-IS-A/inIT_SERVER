@@ -3,6 +3,11 @@ const Sequelize = require('sequelize');
 module.exports = class Evaluation extends Sequelize.Model{
     static init(sequelize) {
         return super.init({
+            eNum: {
+                type: Sequelize.INTEGER,
+                autoIncrement: true,
+                primaryKey: true
+            },
             mNum: {
                 type: Sequelize.INTEGER,
                 allowNull: false
