@@ -465,6 +465,30 @@ app.get('/userAll', async function(req,res){
     });
 });
 
+//모집중인 프로젝트 검색
+app.post('/searchIng', async function(req,res){
+    var keyword = req.body.keyword;
+
+    var projectInfo = await ProjectInfo.findAll({
+        where:{
+            pState: 0,
+            [Op.or]: [
+                {pTitle: {[Op.like]: '%'+keyword+'%'}},
+                {pDescription: {[Op.like]: '%'+keyword+'%'}}
+            ]
+        },
+        include: [{
+            attributes: ['mNum', 'mName'],
+            model: Member
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "projectInfo": projectInfo
+    });
+});
+
 //프로젝트 공고 삭제
 app.post('/delProject', function(req, res) {
     var pNum = req.body.pNum;
