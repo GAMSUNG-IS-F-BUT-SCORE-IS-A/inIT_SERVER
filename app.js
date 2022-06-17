@@ -469,14 +469,14 @@ app.get('/notRecruitingProject', async function (req, res) {
             model: Member
         }]
     });
-    
+
     var projectInfo = [];
     var projectState;
     for (var i = 0; i < notRecruitingProject.length; i++) {
-        if(notRecruitingProject[i].pState == 1) {
+        if (notRecruitingProject[i].pState == 1) {
             projectState = "ING";
         }
-        else if(notRecruitingProject[i].pState == 2){
+        else if (notRecruitingProject[i].pState == 2) {
             projectState = "FIN";
         }
         projectInfo[i] = {
@@ -548,7 +548,7 @@ app.post('/searchEd', async function (req, res) {
     var reslut = await ProjectInfo.findAll({
         where: {
             pState: {
-                [Op.or]: [1,2]
+                [Op.or]: [1, 2]
             },
             [Op.or]: [
                 { pTitle: { [Op.like]: '%' + keyword + '%' } },
@@ -564,10 +564,10 @@ app.post('/searchEd', async function (req, res) {
     var projectInfo = [];
     var projectState;
     for (var i = 0; i < reslut.length; i++) {
-        if(reslut[i].pState == 1) {
+        if (reslut[i].pState == 1) {
             projectState = "ING";
         }
-        else if(reslut[i].pState == 2){
+        else if (reslut[i].pState == 2) {
             projectState = "FIN";
         }
         projectInfo[i] = {
@@ -673,7 +673,7 @@ app.post('/home', async function (req, res) {
     //날짜 정보
     var projectState;
     var list_join = [];
-    for(var i=0;i<list_belong.length;i++) {
+    for (var i = 0; i < list_belong.length; i++) {
         if (list_belong[i].pState == 0) {//모집중
             var today = moment();
             var pRecruitDue = moment(list_belong[i].pRecruitDue);
@@ -799,7 +799,7 @@ app.post('/home', async function (req, res) {
     //날짜 정보
     var projectState2;
     var listRecommend = [];
-    for(var i=0;i<list_recommend.length;i++) {
+    for (var i = 0; i < list_recommend.length; i++) {
         if (list_recommend[i].pState == 0) {//모집중
             var today = moment();
             var pRecruitDue = moment(list_recommend[i].pRecruitDue);
@@ -849,7 +849,7 @@ app.post('/getbelongedProject', async function (req, res) {
     //날짜 정보
     var projectState;
     var list_join = [];
-    for(var i=0;i<pInfo.length;i++) {
+    for (var i = 0; i < pInfo.length; i++) {
         if (pInfo[i].pState == 0) {//모집중
             var today = moment();
             var pRecruitDue = moment(pInfo[i].pRecruitDue);
@@ -978,7 +978,7 @@ app.post('/getRecommenedProject', async function (req, res) {
     //날짜 정보
     var projectState;
     var list_recommend = [];
-    for(var i=0;i<pInfo.length;i++) {
+    for (var i = 0; i < pInfo.length; i++) {
         if (pInfo[i].pState == 0) {//모집중
             var today = moment();
             var pRecruitDue = moment(pInfo[i].pRecruitDue);
@@ -1962,7 +1962,7 @@ app.post('/allTodoPlan', async function (req, res) {
     var pNum = req.body.pNum;
 
     var todoInfo = await Todo.findAll({
-        where: { 
+        where: {
             pNum: pNum,
             tPart: 0
         }
@@ -1998,7 +1998,7 @@ app.post('/allTodoDesign', async function (req, res) {
     var pNum = req.body.pNum;
 
     var todoInfo = await Todo.findAll({
-        where: { 
+        where: {
             pNum: pNum,
             tPart: 1
         }
@@ -2034,7 +2034,7 @@ app.post('/allTodoIos', async function (req, res) {
     var pNum = req.body.pNum;
 
     var todoInfo = await Todo.findAll({
-        where: { 
+        where: {
             pNum: pNum,
             tPart: 2
         }
@@ -2070,7 +2070,7 @@ app.post('/allTodoAos', async function (req, res) {
     var pNum = req.body.pNum;
 
     var todoInfo = await Todo.findAll({
-        where: { 
+        where: {
             pNum: pNum,
             tPart: 3
         }
@@ -2106,7 +2106,7 @@ app.post('/allTodoWeb', async function (req, res) {
     var pNum = req.body.pNum;
 
     var todoInfo = await Todo.findAll({
-        where: { 
+        where: {
             pNum: pNum,
             tPart: 4
         }
@@ -2142,7 +2142,7 @@ app.post('/allTodoGame', async function (req, res) {
     var pNum = req.body.pNum;
 
     var todoInfo = await Todo.findAll({
-        where: { 
+        where: {
             pNum: pNum,
             tPart: 5
         }
@@ -2178,7 +2178,7 @@ app.post('/allTodoServer', async function (req, res) {
     var pNum = req.body.pNum;
 
     var todoInfo = await Todo.findAll({
-        where: { 
+        where: {
             pNum: pNum,
             tPart: 6
         }
