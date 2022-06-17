@@ -391,9 +391,9 @@ app.post('/detailProject', async function (req, res) {
     //날짜 정보
     var projectState;
     if (projectInfo.pState == 0) {//모집중
-        var pRecruitStart = moment(projectInfo.pRecruitStart);
+        var today = moment();
         var pRecruitDue = moment(projectInfo.pRecruitDue);
-        var due = pRecruitDue.diff(pRecruitStart, 'days')
+        var due = pRecruitDue.diff(today, 'days')
         projectState = "D-" + due;
     }
     else if (projectInfo.pState == 1) {//프로젝트 진행중
@@ -438,13 +438,14 @@ app.get('/recrutingProject', async function (req, res) {
     });
 
     var projectInfo = [];
+    var projectState;
     for (var i = 0; i < recruitingProject.length; i++) {
-        var pRecruitStart = moment(recruitingProject.pRecruitStart);
-        var pRecruitDue = moment(recruitingProject.pRecruitDue);
-        var due = pRecruitDue.diff(pRecruitStart, 'days')
+        var today = moment();
+        var pRecruitDue = moment(recruitingProject[i].pRecruitDue);
+        var due = pRecruitDue.diff(today, 'days')
         projectState = "D-" + due;
         projectInfo[i] = {
-            recruitingProject: recruitingProject,
+            recruitingProject: recruitingProject[i],
             projectState: projectState
         };
     }
@@ -462,21 +463,31 @@ app.get('/notRecruitingProject', async function (req, res) {
     const notRecruitingProject = await ProjectInfo.findAll({
         where: {
             [Op.or]: [{ pState: 1 }, { pState: 2 }]
-        }
-    });
-    //작성자
-    var writer = [];
-    for (var i = 0; i < notRecruitingProject.length; i++) {
-        writer[i] = await Member.findOne({
+        },
+        include: [{
             attributes: ['mNum', 'mName'],
-            where: { mNum: notRecruitingProject[i].mNum }
-        });
+            model: Member
+        }]
+    });
+    
+    var projectInfo = [];
+    var projectState;
+    for (var i = 0; i < notRecruitingProject.length; i++) {
+        if(notRecruitingProject[i].pState == 1) {
+            projectState = "ING";
+        }
+        else if(notRecruitingProject[i].pState == 2){
+            projectState = "FIN";
+        }
+        projectInfo[i] = {
+            notRecruitingProject: notRecruitingProject[i],
+            projectState: projectState
+        };
     }
 
     res.json({
         "code": 201,
-        "notRecruitingProject": notRecruitingProject,
-        "writer": writer
+        "projectInfo": projectInfo,
     });
 });
 
@@ -497,7 +508,7 @@ app.get('/userAll', async function (req, res) {
 app.post('/searchIng', async function (req, res) {
     var keyword = req.body.keyword;
 
-    var projectInfo = await ProjectInfo.findAll({
+    var result = await ProjectInfo.findAll({
         where: {
             pState: 0,
             [Op.or]: [
@@ -511,6 +522,19 @@ app.post('/searchIng', async function (req, res) {
         }]
     });
 
+    var projectInfo = [];
+    var projectState;
+    for (var i = 0; i < result.length; i++) {
+        var today = moment();
+        var pRecruitDue = moment(result[i].pRecruitDue);
+        var due = pRecruitDue.diff(today, 'days')
+        projectState = "D-" + due;
+        projectInfo[i] = {
+            recruitingProject: result[i],
+            projectState: projectState
+        };
+    }
+
     res.json({
         "code": 201,
         "projectInfo": projectInfo
@@ -521,9 +545,11 @@ app.post('/searchIng', async function (req, res) {
 app.post('/searchEd', async function (req, res) {
     var keyword = req.body.keyword;
 
-    var projectInfo = await ProjectInfo.findAll({
+    var reslut = await ProjectInfo.findAll({
         where: {
-            [Op.or]: [{ pState: 1 }, { pState: 2 }],
+            pState: {
+                [Op.or]: [1,2]
+            },
             [Op.or]: [
                 { pTitle: { [Op.like]: '%' + keyword + '%' } },
                 { pDescription: { [Op.like]: '%' + keyword + '%' } }
@@ -534,6 +560,21 @@ app.post('/searchEd', async function (req, res) {
             model: Member
         }]
     });
+
+    var projectInfo = [];
+    var projectState;
+    for (var i = 0; i < reslut.length; i++) {
+        if(reslut[i].pState == 1) {
+            projectState = "ING";
+        }
+        else if(reslut[i].pState == 2){
+            projectState = "FIN";
+        }
+        projectInfo[i] = {
+            notRecruitingProject: reslut[i],
+            projectState: projectState
+        };
+    }
 
     res.json({
         "code": 201,
@@ -615,8 +656,13 @@ app.post('/home', async function (req, res) {
                 rApproval: 1
             },
             model: Recruit,
+        }],
+        include: [{
+            attributes: ['mNum', 'mName'],
+            model: Member
         }]
     });
+
     if (projectInfoList1.length < 3) {
         list_belong = projectInfoList1;
     }
@@ -624,16 +670,26 @@ app.post('/home', async function (req, res) {
         list_belong = projectInfoList1.slice(0, 3);
     }
 
-    //소속 프로젝트 공고 작성자
-    var writerInfo_belong = [];
-    for (var i = 0; i < list_belong.length; i++) {
-
-        writerInfo_belong[i] = await Member.findAll({
-            attributes: ['mNum', 'mName'],
-            where: {
-                mNum: list_belong[i].mNum
-            }
-        });
+    //날짜 정보
+    var projectState;
+    var list_join = [];
+    for(var i=0;i<list_belong.length;i++) {
+        if (list_belong[i].pState == 0) {//모집중
+            var today = moment();
+            var pRecruitDue = moment(list_belong[i].pRecruitDue);
+            var due = pRecruitDue.diff(today, 'days')
+            projectState = "D-" + due;
+        }
+        else if (list_belong[i].pState == 1) {//프로젝트 진행중
+            projectState = "ING";
+        }
+        else if (list_belong[i].pState == 2) {//프로젝트 종료
+            projectState = "FIN";
+        }
+        list_join[i] = {
+            list_belong: list_belong[i],
+            projectState: projectState
+        }
     }
 
 
@@ -647,7 +703,11 @@ app.post('/home', async function (req, res) {
                     pPlan: { [Op.gte]: 1 },
                     [Op.or]: [{ pPlanf: null }, { pPlanf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 1:
@@ -656,7 +716,11 @@ app.post('/home', async function (req, res) {
                     pDesign: { [Op.gte]: 1 },
                     [Op.or]: [{ pDesignf: null }, { pDesignf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 2:
@@ -665,7 +729,11 @@ app.post('/home', async function (req, res) {
                     pIos: { [Op.gte]: 1 },
                     [Op.or]: [{ pIosf: null }, { pIosf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 3:
@@ -674,7 +742,11 @@ app.post('/home', async function (req, res) {
                     pAos: { [Op.gte]: 1 },
                     [Op.or]: [{ pAosf: null }, { pAosf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 4:
@@ -683,7 +755,11 @@ app.post('/home', async function (req, res) {
                     pGame: { [Op.gte]: 1 },
                     [Op.or]: [{ pGamef: null }, { pGamef: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 5:
@@ -692,7 +768,11 @@ app.post('/home', async function (req, res) {
                     pWeb: { [Op.gte]: 1 },
                     [Op.or]: [{ pWebf: null }, { pWebf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 6:
@@ -701,7 +781,11 @@ app.post('/home', async function (req, res) {
                     pServer: { [Op.gte]: 1 },
                     [Op.or]: [{ pServerf: null }, { pServerf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
     };
@@ -712,26 +796,32 @@ app.post('/home', async function (req, res) {
         list_recommend = projectInfoList2.slice(0, 3);
     }
 
-    //추천 플젝 공고 작성자
-    var writerInfo_recommend = [];
-    for (var i = 0; i < list_recommend.length; i++) {
-
-        writerInfo_recommend[i] = await Member.findAll({
-            attributes: ['mNum', 'mName'],
-            where: {
-                mNum: list_recommend[i].mNum
-            }
-        });
+    //날짜 정보
+    var projectState2;
+    var listRecommend = [];
+    for(var i=0;i<list_recommend.length;i++) {
+        if (list_recommend[i].pState == 0) {//모집중
+            var today = moment();
+            var pRecruitDue = moment(list_recommend[i].pRecruitDue);
+            var due = pRecruitDue.diff(today, 'days')
+            projectState2 = "D-" + due;
+        }
+        else if (list_recommend[i].pState == 1) {//프로젝트 진행중
+            projectState2 = "ING";
+        }
+        else if (list_recommend[i].pState == 2) {//프로젝트 종료
+            projectState2 = "FIN";
+        }
+        listRecommend[i] = {
+            listRecommend: list_recommend[i],
+            projectState2: projectState2
+        }
     }
-
-    console.log(list_belong[0]);
 
     res.json({
         "code": 201,
-        "list_belong": list_belong,
-        "writerInfo_belong": writerInfo_belong,
-        "list_recommend": list_recommend,
-        "writerInfo_recommend": writerInfo_recommend
+        "list_join": list_join,
+        "list_recommend": listRecommend
     });
 });
 
@@ -749,26 +839,38 @@ app.post('/getbelongedProject', async function (req, res) {
                 mNum: mNum,
                 rApproval: 1
             },
+        }],
+        include: [{
+            attributes: ['mNum', 'mName'],
+            model: Member
         }]
     });
 
-    //프로젝트 작성자 이름
-    var writerNum = [];
-    var writerInfo = [];
-    for (var i = 0; i < pInfo.length; i++) {
-        writerNum[i] = pInfo[i].mNum;
+    //날짜 정보
+    var projectState;
+    var list_join = [];
+    for(var i=0;i<pInfo.length;i++) {
+        if (pInfo[i].pState == 0) {//모집중
+            var today = moment();
+            var pRecruitDue = moment(pInfo[i].pRecruitDue);
+            var due = pRecruitDue.diff(today, 'days')
+            projectState = "D-" + due;
+        }
+        else if (pInfo[i].pState == 1) {//프로젝트 진행중
+            projectState = "ING";
+        }
+        else if (pInfo[i].pState == 2) {//프로젝트 종료
+            projectState = "FIN";
+        }
+        list_join[i] = {
+            pInfo: pInfo[i],
+            projectState: projectState
+        }
+    }
 
-        writerInfo[i] = await Member.findAll({
-            attributes: ['mNum', 'mName'],
-            where: {
-                mNum: writerNum[i]
-            }
-        });
-    };
 
     res.json({
-        "pInfo": pInfo,
-        "writerInfo": writerInfo
+        "list_join": list_join
     });
 
 });
@@ -778,7 +880,6 @@ app.post('/getRecommenedProject', async function (req, res) {
     var mPosition = req.body.mPosition;
     var mLevel = req.body.mLevel;
     var pInfo = [];
-    var writerInfo = [];
 
     switch (mPosition) {
         case 0:
@@ -787,7 +888,11 @@ app.post('/getRecommenedProject', async function (req, res) {
                     pPlan: { [Op.gte]: 1 },
                     [Op.or]: [{ pPlanf: null }, { pPlanf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 1:
@@ -796,7 +901,11 @@ app.post('/getRecommenedProject', async function (req, res) {
                     pDesign: { [Op.gte]: 1 },
                     [Op.or]: [{ pDesignf: null }, { pDesignf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 2:
@@ -805,7 +914,11 @@ app.post('/getRecommenedProject', async function (req, res) {
                     pIos: { [Op.gte]: 1 },
                     [Op.or]: [{ pIosf: null }, { pIosf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 3:
@@ -814,7 +927,11 @@ app.post('/getRecommenedProject', async function (req, res) {
                     pAos: { [Op.gte]: 1 },
                     [Op.or]: [{ pAosf: null }, { pAosf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 4:
@@ -823,7 +940,11 @@ app.post('/getRecommenedProject', async function (req, res) {
                     pGame: { [Op.gte]: 1 },
                     [Op.or]: [{ pGamef: null }, { pGamef: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 5:
@@ -832,7 +953,11 @@ app.post('/getRecommenedProject', async function (req, res) {
                     pWeb: { [Op.gte]: 1 },
                     [Op.or]: [{ pWebf: null }, { pWebf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
         case 6:
@@ -841,25 +966,39 @@ app.post('/getRecommenedProject', async function (req, res) {
                     pServer: { [Op.gte]: 1 },
                     [Op.or]: [{ pServerf: null }, { pServerf: { [Op.gte]: mLevel } }],
                     pState: 0
-                }
+                },
+                include: [{
+                    attributes: ['mNum', 'mName'],
+                    model: Member
+                }]
             });
             break;
     };
 
-    //작성자 정보
-    for (var i = 0; i < pInfo.length; i++) {
-
-        writerInfo[i] = await Member.findAll({
-            attributes: ['mNum', 'mName'],
-            where: {
-                mNum: pInfo[i].mNum
-            }
-        });
+    //날짜 정보
+    var projectState;
+    var list_recommend = [];
+    for(var i=0;i<pInfo.length;i++) {
+        if (pInfo[i].pState == 0) {//모집중
+            var today = moment();
+            var pRecruitDue = moment(pInfo[i].pRecruitDue);
+            var due = pRecruitDue.diff(today, 'days')
+            projectState = "D-" + due;
+        }
+        else if (pInfo[i].pState == 1) {//프로젝트 진행중
+            projectState = "ING";
+        }
+        else if (pInfo[i].pState == 2) {//프로젝트 종료
+            projectState = "FIN";
+        }
+        list_recommend[i] = {
+            pInfo: pInfo[i],
+            projectState: projectState
+        }
     }
 
     res.json({
-        "pInfo": pInfo,
-        "writerInfo": writerInfo
+        "list_recommend": list_recommend,
     });
 });
 
