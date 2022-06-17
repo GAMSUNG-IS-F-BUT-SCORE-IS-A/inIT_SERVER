@@ -1830,3 +1830,22 @@ app.post('/checkEvaluation', async function(req,res){
         "evaluation": myEvaluation
     });
 });
+
+//평가 삭제
+app.post('/deleteEvaluation', async function(req,res){
+    var eNum = req.body.eNum;
+
+    Evaluation.destroy({
+        where: {eNum: eNum}
+    })
+    .then(()=>{
+        var message = "평가가 삭제되었습니다";
+        res.json({
+            "code": 201,
+            "message": message
+        });
+    })
+    .catch((err)=>{
+        console.log(err);
+    });
+})
