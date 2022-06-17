@@ -10,6 +10,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const bufferImage = require('buffer-image');
 const dotenv = require('dotenv');
+const moment = require('moment');
 
 //시퀄라이저
 //const { sequelize, Recruit } = require('./models');
@@ -387,7 +388,20 @@ app.post('/detailProject', async function(req, res){
         var stacks = projectInfo.pStack.split(',');
         projectInfo.pStack = stacks;
     }
-
+    //날짜 정보
+    var projectState;
+    if(projectInfo.pState == 0){//모집중
+        var pRecruitStart = moment(projectInfo.pRecruitStart);
+        var pRecruitDue = moment(projectInfo.pRecruitDue);
+        var due = pRecruitDue.diff(pRecruitStart, 'days')
+        projectState = "D-" + due;
+    }
+    else if(projectInfo.pState == 1) {//프로젝트 진행중
+        projectState = "ING";
+    }
+    else if(projectInfo.pState == 2) {//프로젝트 종료
+        projectState = "FIN";
+    }
     //작성자 정보
     var writer = projectInfo.mNum;
     var writerInfo = await Member.findOne({
@@ -397,11 +411,16 @@ app.post('/detailProject', async function(req, res){
         }
     });
 
+    detailInfo = {
+        projectInfo: projectInfo,
+        projectState: projectState,
+        writerInfo: writerInfo
+    };
+
     res.json({
         "code": 201,
         "isApproval": isApproval,
-        "projectInfo": projectInfo,
-        "writerInfo": writerInfo
+        "detailInfo": detailInfo
     });
 });
 
