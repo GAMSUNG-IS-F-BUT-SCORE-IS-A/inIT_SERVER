@@ -1335,6 +1335,331 @@ app.post('/detailFeed', async function (req, res) {
     });
 });
 
+//작성자 - 팀원 확인: 기획
+app.post('/myCrewPlan', async function(req,res){
+    var pNum = req.body.pNum
+
+    var approvedPlan = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 0,
+                rApproval: 1
+            }
+        }]
+    });
+
+    var waitingPlan = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 0,
+                rApproval: 0
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedPlan": approvedPlan,
+        "waitingPlan": waitingPlan
+    });
+});
+
+//작성자 - 팀원 확인: 디자인
+app.post('/myCrewDesign', async function(req,res){
+    var pNum = req.body.pNum
+
+    var approvedDesign = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 1,
+                rApproval: 1
+            }
+        }]
+    });
+
+    var waitingDesign = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 1,
+                rApproval: 0
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedDesign": approvedDesign,
+        "waitingDesign": waitingDesign
+    });
+});
+
+//작성자 - 팀원 확인: ios
+app.post('/myCrewIos', async function(req,res){
+    var pNum = req.body.pNum
+
+    var approvedIos = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 2,
+                rApproval: 1
+            }
+        }]
+    });
+
+    var waitingIos = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 2,
+                rApproval: 0
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedIos": approvedIos,
+        "waitingIos": waitingIos
+    });
+});
+
+//작성자 - 팀원 확인: aos
+app.post('/myCrewAos', async function(req,res){
+    var pNum = req.body.pNum
+
+    var approvedAos = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 3,
+                rApproval: 1
+            }
+        }]
+    });
+
+    var waitingAos = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 3,
+                rApproval: 0
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedAos": approvedAos,
+        "waitingAos": waitingAos
+    });
+});
+
+//작성자 - 팀원 확인: web
+app.post('/myCrewWeb', async function(req,res){
+    var pNum = req.body.pNum
+
+    var approvedWeb = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 4,
+                rApproval: 1
+            }
+        }]
+    });
+
+    var waitingWeb = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 4,
+                rApproval: 0
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedWeb": approvedWeb,
+        "waitingWeb": waitingWeb
+    });
+});
+
+//작성자 - 팀원 확인: 게임
+app.post('/myCrewGame', async function(req,res){
+    var pNum = req.body.pNum
+
+    var approvedGame = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 5,
+                rApproval: 1
+            }
+        }]
+    });
+
+    var waitingGame = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 5,
+                rApproval: 0
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedGame": approvedGame,
+        "waitingGame": waitingGame
+    });
+});
+
+//작성자 - 팀원 확인: 서버
+app.post('/myCrewServer', async function(req,res){
+    var pNum = req.body.pNum
+
+    var approvedServer = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 6,
+                rApproval: 1
+            }
+        }]
+    });
+
+    var waitingServer = await Member.findAll({
+        attributes: ['mNum', 'mName', 'mEmail', 'mPhoto'],
+        include: [{
+            model: Recruit,
+            where: {
+                pNum: pNum,
+                rPosition: 6,
+                rApproval: 0
+            }
+        }]
+    });
+
+    res.json({
+        "code": 201,
+        "approvedServer": approvedServer,
+        "waitingServer": waitingServer
+    });
+});
+
+//프로젝트 승인해주기
+app.post('/approve', async function(req,res){
+    var mNum = req.body.mNum; // 작성자
+    var pNum = req.body.pNum; //현재 프로젝트
+    var apply = req.body.apply; //지원자 mNum
+
+    //작성자 맞는지 확인
+    var thisproject = await ProjectInfo.findOne({
+        attributes: ['mNum'],
+        where: {pNum: pNum}
+    });
+
+    if(thisproject.mNum == mNum) {//작성자가 맞으면
+        Recruit.update({
+            rApproval: 1
+        }, {
+            where: {
+                mNum: apply,
+                pNum: pNum
+            }
+        })
+        .then(()=>{
+            var message = "승인되었습니다";
+            res.json({
+                "code": 201,
+                "message": message
+            });
+        })
+        .catch((err)=>{
+            console.log(err);
+        });
+    }
+    else{//작성자가 아니면
+        var message = "승인 권한이 없습니다"
+        res.json({
+            "code": 202,
+            "message": message
+        });
+    }
+});
+
+//승인 거부
+app.post('/reject', async function(req,res){
+    var mNum = req.body.mNum; // 작성자
+    var pNum = req.body.pNum; //현재 프로젝트
+    var apply = req.body.apply; //지원자 mNum
+
+    //작성자 맞는지 확인
+    var thisproject = await ProjectInfo.findOne({
+        attributes: ['mNum'],
+        where: {pNum: pNum}
+    });
+
+    if(thisproject.mNum == mNum) {//작성자가 맞으면
+        Recruit.destroy({
+            where: {
+                mNum: apply,
+                pNum: pNum
+            }
+        })
+        .then(()=>{
+            var message = "거절되었습니다";
+            res.json({
+                "code": 201,
+                "message": message
+            });
+        })
+        .catch((err)=>{
+            console.log(err);
+        });
+    }
+    else{//작성자가 아니면
+        var message = "거절 권한이 없습니다"
+        res.json({
+            "code": 202,
+            "message": message
+        });
+    }
+})
+
 //승인된 팀원 정보 - 전체
 app.post('/teamMember', async function (req, res) {
     var pNum = req.body.pNum;
