@@ -1155,11 +1155,16 @@ app.post('/countProject', async function (req, res) {
     var mNum = req.body.mNum;
 
     var joinedProject = await Recruit.findAll({
+        include: [{
+            model: ProjectInfo,
+            where: {[Op.or]: [{ pState: 1 }, { pState: 2 }]}
+        }],
         where: {
             mNum: mNum,
             rApproval: 1
         }
     });
+
 
     var uploadProject = await ProjectInfo.findAll({
         where: {
