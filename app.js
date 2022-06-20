@@ -95,7 +95,7 @@ async function readImageFile(file) {
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
-app.listen(3006, '192.168.1.174', (err) => {
+app.listen(3006, '172.30.1.17', (err) => {
     if (!err) {
         console.log('server start');
     }
@@ -277,7 +277,7 @@ app.post('/withdraw', function (req, res) {
 
 //프로젝트 글쓰기
 app.post('/addProject', async function (req, res) {
-    console.log(req);
+    console.log("프로젝트: " + req);
     var pTitle = req.body.pTitle;
     var pType = req.body.pType;
     var pRecruitStart = req.body.pRecruitStart;
@@ -604,7 +604,7 @@ app.post('/apply', async function (req, res) {
     var mNum = req.body.mNum;
     var pNum = req.body.pNum;
     var rPosition = req.body.rPosition;
-    console.log(req);
+    console.log("지원자"+ mNum + "프로젝트"+pNum + "포지션"+rPosition);
 
     var alreadyApply = await Recruit.findAll({
         where: {
@@ -612,7 +612,16 @@ app.post('/apply', async function (req, res) {
             pNum: pNum
         }
     });
-    if (alreadyApply == null) {
+    console.log(alreadyApply.rNum);
+    if (alreadyApply.length != 0) {
+        var message = "이미 지원한 프로젝트입니다";
+        console.log(message)
+        res.json({
+            "code": 202,
+            "message": message
+        });
+    }
+    else {
         console.log("지원 성공");
         Recruit.create({
             mNum: mNum,
@@ -630,14 +639,6 @@ app.post('/apply', async function (req, res) {
             .catch((err) => {
                 console.log(err);
             });
-    }
-    else {
-        var message = "이미 지원한 프로젝트입니다";
-        console.log(message)
-        res.json({
-            "code": 202,
-            "message": message
-        });
     }
 
 });
