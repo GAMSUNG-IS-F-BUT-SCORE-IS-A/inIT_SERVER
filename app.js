@@ -43,12 +43,30 @@ sequelize.sync({ force: false })
     })
 
 //미들웨어 등록
-app.use(morgan('dev'));
+app.use(cookieParser(process.env.COOKIE_SECRET));
+const sessionOption = {
+    resave: false,
+    saveUninitialize: false,
+    secret: process.env.COOKIE_SECRET,
+    cookie: {
+        httpOnly: true,
+        secure: false,
+    },
+};
+
+if(process.env.NODE_ENV === 'production') {
+    sessionOption.proxy = true;
+    app.use(morgan('combined'));
+} else {
+    app.use(morgan('dev'));
+}
+app.use(session(sessionOption));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
 app.use(bodyParser.json());
+/*
 app.use(session({
     resave: false,
     saveUninitialized: false,
@@ -58,7 +76,7 @@ app.use(session({
         secure: false,
     },
     name: 'session-cookie',
-}));
+}));*/
 
 //이미지 저장 서버 디스크 생성
 try {
