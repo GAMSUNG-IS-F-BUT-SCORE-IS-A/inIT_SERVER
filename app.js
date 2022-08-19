@@ -12,6 +12,10 @@ const bufferImage = require('buffer-image');
 const dotenv = require('dotenv');
 const moment = require('moment');
 
+//REDIS
+const redis = require('redis');
+const RedisStore = require('connect-redis')(session);
+
 //시퀄라이저
 //const { sequelize, Recruit } = require('./models');
 const { sequelize } = require('./models');
@@ -28,6 +32,11 @@ const Evaluation = require('./models/evaluation');
 
 //dotenv 패키지 사용
 dotenv.config();
+//redis
+const redisClient = redis.createClient({
+    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+    password: process.env.REDIS_PASSWORD
+});
 
 //express 객체 생성
 const app = express();
@@ -52,6 +61,7 @@ const sessionOption = {
         httpOnly: true,
         secure: false,
     },
+    store: new RedisStore({ client: redisClient }),
 };
 
 if(process.env.NODE_ENV === 'production') {
