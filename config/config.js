@@ -16,7 +16,7 @@ module.exports = {
         dialect: 'mysql'
       },
       production: {
-        username: 'root',
+        username: 'testuser',
         password: process.env.SEQUELIZE_PASSWORD,
         database: 'init',
         host: '127.0.0.1',
