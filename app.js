@@ -41,6 +41,8 @@ const redisClient = redis.createClient({
 //express 객체 생성
 const app = express();
 
+app.set('port', process.env.PORT || 3006);
+
 
 //데이터베이스 연결
 sequelize.sync({ force: false })
@@ -123,11 +125,18 @@ async function readImageFile(file) {
 //서버 실행
 //각자 ip주소 넣기, port: 3006 변경 금지!
 //학교: 172.18.9.151  집: 172.30.1.25
+
 app.listen(3006, '172.18.0.141', (err) => {
     if (!err) {
+        console.log('server start in 172.18.0.141');
+    }
+});
+/*
+app.listen(app.get('port', ()=>{
+    if(!err) {
         console.log('server start');
     }
-})
+}));*/
 
 
 //앱 로그인
