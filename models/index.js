@@ -1,5 +1,3 @@
-//branch for aws
-
 'use strict';
 
 const Sequelize = require('sequelize');
